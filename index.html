@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Impostor - Juego de Fiesta</title>
@@ -1020,5 +1021,9 @@
             switchScreen("screen-setup");
         }
     </script>
+    <!-- Botón flotante para instalar la App -->
+<button id="btn-instalar-pwa" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; background: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+    📥 Instalar App
+</button>
 </body>
 </html>
