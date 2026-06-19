@@ -1020,6 +1020,37 @@
         function resetToHome() {
             switchScreen("screen-setup");
         }
+        // Lógica nativa para activar la instalación en celular y PC
+let eventoInstalacion;
+const botonInstalar = document.getElementById('btn-instalar-pwa');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Evita que el navegador lance el aviso automático aburrido
+    e.preventDefault();
+    // Guarda el evento para usarlo cuando presionen tu botón
+    eventoInstalacion = e;
+    // Muestra tu botón flotante violeta estilizado
+    botonInstalar.style.display = 'block';
+});
+
+botonInstalar.addEventListener('click', async () => {
+    if (eventoInstalacion) {
+        // Dispara el menú de instalación original del celular
+        eventoInstalacion.prompt();
+        const { outcome } = await eventoInstalacion.userChoice;
+        if (outcome === 'accepted') {
+            botonInstalar.style.display = 'none';
+        }
+        eventoInstalacion = null;
+    }
+});
+
+// Oculta el botón si el usuario ya lo instaló con éxito
+window.addEventListener('appinstalled', () => {
+    botonInstalar.style.display = 'none';
+    console.log('¡El Impostor se instaló correctamente!');
+});
+        
     </script>
     <!-- Botón flotante para instalar la App -->
 <button id="btn-instalar-pwa" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; background: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
