@@ -5,139 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Impostor - Juego de Fiesta</title>
-    <!-- Librería PeerJS -->
+    
+    <!-- Librería PeerJS (Para el modo local gratis) -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #08080c;
-            --card-bg: #11111a;
-            --card-border: #1e1e2f;
-            --primary: #8b5cf6;
-            --primary-hover: #7c3aed;
-            --primary-glow: rgba(139, 92, 246, 0.4);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --danger-glow: rgba(239, 68, 68, 0.3);
-            --success: #10b981;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-            overflow: hidden;
-        }
-
-        .game-container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 2rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            height: 90vh;
-            max-height: 700px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Corregido: Las pantallas ahora tienen una transición limpia */
-        .screen {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .screen.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 0.5rem; font-weight: 800; }
-        h1 span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
-        p.subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
-
-        .btn {
-            background-color: var(--primary);
-            color: #ffffff;
-            border: none;
-            padding: 1rem;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            margin-bottom: 0.6rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-        .btn:disabled { background: #2e2e3e; color: #555; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
-
-        .setup-group { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.2rem; margin-bottom: 1rem; }
-        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
-        .option-card { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.8rem; text-align: center; cursor: pointer; font-size: 0.8rem; }
-        .option-card.selected { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
-
-        /* Botón instalar */
-        #btn-instalar-pwa {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-            display: none;
-        }
-
-        /* Otros */
-        .room-badge { background: #1a1a2e; padding: 1rem; border-radius: 12px; text-align: center; font-size: 1.4rem; font-weight: bold; color: var(--primary); border: 1px dashed var(--primary); margin: 1rem 0; letter-spacing: 3px; }
-        .press-pad { width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--primary); margin: 1rem auto; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; }
-        .timer-display { font-size: 3rem; font-weight: 800; text-align: center; margin: 1rem 0; color: var(--primary); }
-    </style>
+    
+    <!-- Enlace a tus estilos -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Botón Instalar -->
     <button id="btn-instalar-pwa">📥 Instalar App</button>
 
     <div class="game-container">
         
-        <!-- PANTALLA 0: MENÚ -->
+        <!-- MENÚ PRINCIPAL -->
         <div id="screen-menu" class="screen active">
             <div style="text-align: center;">
-                <img src="icono.png" alt="Logo" style="width: 100px; border-radius: 24px; margin-bottom: 1rem;">
+                <img src="icono.png" alt="Logo" class="main-logo">
                 <h1>EL <span>IMPOSTOR</span></h1>
                 <p class="subtitle">Selecciona el modo de juego</p>
                 <div style="margin-top: 1.5rem;">
@@ -147,33 +32,46 @@
             </div>
         </div>
 
-        <!-- PANTALLA MULTI OPCIONES -->
+        <!-- SECCIÓN MODO LOCAL (MULTIJUGADOR) -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
-                <p class="subtitle">Conecta con tus amigos</p>
+                <p class="subtitle">¿Cómo van a jugar?</p>
+                
                 <div class="setup-group">
-                    <input type="text" id="multi-name" placeholder="Tu nombre..." style="width:100%; padding:12px; border-radius:10px; border:none; background:#222; color:white; text-align:center;">
+                    <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
                 </div>
+
+                <div class="option-grid">
+                    <div class="option-card selected" id="opt-cards" onclick="setMultiMode('cards')">
+                        🃏 Tarjetas
+                        <div class="mini-desc">Están cerca hablando</div>
+                    </div>
+                    <div class="option-card" id="opt-chat" onclick="setMultiMode('chat')">
+                        💬 Chat
+                        <div class="mini-desc">Están lejos (Escriben)</div>
+                    </div>
+                </div>
+
                 <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
                 <div style="display: flex; gap: 5px;">
-                    <input type="text" id="join-id" placeholder="Código" style="width:50%; padding:12px; border-radius:10px; border:none; background:#222; color:white; text-align:center;">
+                    <input type="text" id="join-id" placeholder="Código" class="code-input-field">
                     <button class="btn" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
                 </div>
             </div>
             <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Volver</button>
         </div>
 
-        <!-- PANTALLA SETUP SINGLE -->
+        <!-- PANTALLA SETUP (SINGLE PLAYER) -->
         <div id="screen-setup" class="screen">
             <div>
                 <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span style="font-size:0.8rem; color:var(--primary);">JUGADORES</span>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <button class="btn" style="width:50px;" onclick="changeCount(-1)">-</button>
-                        <span id="player-count-val" style="font-size:1.5rem; font-weight:bold;">4</span>
-                        <button class="btn" style="width:50px;" onclick="changeCount(1)">+</button>
+                    <span class="label-purple">JUGADORES</span>
+                    <div class="num-selector">
+                        <button class="btn-small" onclick="changeCount(-1)">-</button>
+                        <span id="player-count-val">4</span>
+                        <button class="btn-small" onclick="changeCount(1)">+</button>
                     </div>
                 </div>
                 <div id="cat-grid-single" class="option-grid"></div>
@@ -185,7 +83,7 @@
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
-                <div id="names-container" style="max-height: 300px; overflow-y: auto;"></div>
+                <div id="names-container" class="scroll-area"></div>
             </div>
             <button class="btn" onclick="initSingleGame()">Comenzar</button>
         </div>
@@ -196,9 +94,9 @@
                 <p class="subtitle" id="reveal-instr">Pasa el teléfono a:</p>
                 <h1 id="reveal-name">---</h1>
                 <div class="press-pad" id="main-pad">MANTÉN</div>
-                <div class="setup-group" style="min-height:80px; display:flex; align-items:center; justify-content:center;">
-                    <div id="word-display" style="display:none; font-weight:bold; font-size:1.3rem;"></div>
-                    <div id="word-hint" class="subtitle">Presiona para ver tu rol</div>
+                <div class="word-box">
+                    <div id="word-display" style="display:none;"></div>
+                    <div id="word-hint">Presiona para ver tu rol</div>
                 </div>
             </div>
             <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido</button>
@@ -207,18 +105,21 @@
         <!-- PANTALLA DEBATE -->
         <div id="screen-debate" class="screen">
             <div>
-                <h1 id="debate-title">DEBATE</h1>
+                <h1>DEBATE</h1>
                 <div class="timer-display" id="timer-val">02:00</div>
+                <div id="host-controls" style="display:none;">
+                    <button class="btn-secondary" onclick="showVoting()">Lanzar Votación</button>
+                </div>
             </div>
-            <button class="btn" onclick="showVoting()">Ir a Votar</button>
+            <button class="btn" id="btn-manual-vote" onclick="showVoting()">Ir a Votar</button>
         </div>
 
         <!-- PANTALLA VOTACIÓN -->
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
-                <p class="subtitle">Selecciona a quién expulsar</p>
-                <div id="vote-list" style="max-height:300px; overflow-y:auto;"></div>
+                <p class="subtitle">¿A quién quieren expulsar?</p>
+                <div id="vote-list" class="scroll-area"></div>
             </div>
             <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar Voto</button>
         </div>
@@ -235,3 +136,8 @@
         </div>
 
     </div>
+
+    <!-- Enlace a tu lógica de juego -->
+    <script src="script.js"></script>
+</body>
+</html>
