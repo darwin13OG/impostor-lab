@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Impostor - Juego de Fiesta</title>
-    <!-- Librería PeerJS para el modo Local Gratis -->
+    <!-- Librería PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         :root {
@@ -49,27 +49,28 @@
             border-radius: 28px;
             padding: 2rem;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            min-height: 640px;
+            height: 90vh;
+            max-height: 700px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
+            overflow: hidden;
         }
 
+        /* Corregido: Las pantallas ahora tienen una transición limpia */
         .screen {
             display: none;
             flex-direction: column;
             justify-content: space-between;
-            flex-grow: 1;
+            height: 100%;
             opacity: 0;
-            transform: scale(0.98);
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .screen.active {
             display: flex;
             opacity: 1;
-            transform: scale(1);
         }
 
         h1 { font-size: 1.8rem; text-align: center; margin-bottom: 0.5rem; font-weight: 800; }
@@ -95,48 +96,58 @@
         }
 
         .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-        .btn:disabled { background: #2e2e3e; cursor: not-allowed; transform: none; }
+        .btn:disabled { background: #2e2e3e; color: #555; cursor: not-allowed; transform: none; }
         .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
 
-        /* Estilos de inputs y listas */
         .setup-group { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.2rem; margin-bottom: 1rem; }
         .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
-        .option-card { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.8rem; text-align: center; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .option-card { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.8rem; text-align: center; cursor: pointer; font-size: 0.8rem; }
         .option-card.selected { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
 
-        /* Estilos modo Local */
+        /* Botón instalar */
+        #btn-instalar-pwa {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            display: none;
+        }
+
+        /* Otros */
         .room-badge { background: #1a1a2e; padding: 1rem; border-radius: 12px; text-align: center; font-size: 1.4rem; font-weight: bold; color: var(--primary); border: 1px dashed var(--primary); margin: 1rem 0; letter-spacing: 3px; }
-        .chat-area { height: 180px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; overflow-y: auto; border: 1px solid var(--card-border); margin-bottom: 10px; font-size: 0.85rem; }
-        .msg { margin-bottom: 5px; }
-        .msg b { color: var(--primary); }
-
-        .vote-item { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); padding: 0.8rem 1.2rem; border-radius: 12px; margin-bottom: 0.5rem; cursor: pointer; display: flex; justify-content: space-between; }
-        .vote-item.selected { border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-        .vote-item.dead { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
-
-        .press-pad { width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--primary); margin: 2rem auto; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; }
+        .press-pad { width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--primary); margin: 1rem auto; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; }
         .timer-display { font-size: 3rem; font-weight: 800; text-align: center; margin: 1rem 0; color: var(--primary); }
     </style>
 </head>
 <body>
 
+    <button id="btn-instalar-pwa">📥 Instalar App</button>
+
     <div class="game-container">
         
-        <!-- PANTALLA 0: MENÚ INICIAL -->
+        <!-- PANTALLA 0: MENÚ -->
         <div id="screen-menu" class="screen active">
             <div style="text-align: center;">
-                <img src="icono.png" alt="Logo" style="width: 110px; border-radius: 24px; margin-bottom: 1rem; box-shadow: 0 0 20px var(--primary-glow);">
+                <img src="icono.png" alt="Logo" style="width: 100px; border-radius: 24px; margin-bottom: 1rem;">
                 <h1>EL <span>IMPOSTOR</span></h1>
                 <p class="subtitle">Selecciona el modo de juego</p>
-                <div style="margin-top: 2rem;">
+                <div style="margin-top: 1.5rem;">
                     <button class="btn" onclick="startSinglePlayer()">📱 Un solo celular</button>
                     <button class="btn btn-secondary" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
                 </div>
             </div>
-            <p style="text-align: center; font-size: 0.7rem; color: var(--text-muted);">v2.0 - Local Multiplayer Ready</p>
         </div>
 
-        <!-- MULTIJUGADOR: CREAR O UNIRSE -->
+        <!-- PANTALLA MULTI OPCIONES -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
@@ -153,30 +164,7 @@
             <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Volver</button>
         </div>
 
-        <!-- LOBBY MULTIJUGADOR -->
-        <div id="screen-lobby" class="screen">
-            <div>
-                <h1>SALA DE <span>ESPERA</span></h1>
-                <div class="room-badge" id="display-room-id">...</div>
-                
-                <div id="host-only-settings" style="display:none;">
-                    <p class="subtitle">Configuración del Host</p>
-                    <div class="option-grid">
-                        <div class="option-card selected" id="opt-cards" onclick="setMultiMode('cards')">Tarjetas</div>
-                        <div class="option-card" id="opt-chat" onclick="setMultiMode('chat')">Chat</div>
-                    </div>
-                </div>
-
-                <div class="setup-group">
-                    <p style="font-size:0.8rem; color:var(--primary); margin-bottom:8px;">JUGADORES CONECTADOS:</p>
-                    <div id="player-list-multi" style="font-size:0.9rem;"></div>
-                </div>
-            </div>
-            <button class="btn" id="btn-start-multi" style="display:none;" onclick="startMultiGame()">Empezar Partida</button>
-            <p id="wait-msg" class="subtitle">Esperando al Host...</p>
-        </div>
-
-        <!-- AJUSTES (Single Player) -->
+        <!-- PANTALLA SETUP SINGLE -->
         <div id="screen-setup" class="screen">
             <div>
                 <h1>AJUSTES</h1>
@@ -193,61 +181,49 @@
             <button class="btn" onclick="goToNames()">Continuar</button>
         </div>
 
-        <!-- NOMBRES (Single Player) -->
+        <!-- PANTALLA NOMBRES -->
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
-                <div id="names-container" style="max-height: 350px; overflow-y: auto;"></div>
+                <div id="names-container" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
             <button class="btn" onclick="initSingleGame()">Comenzar</button>
         </div>
 
-        <!-- REVELADO -->
+        <!-- PANTALLA REVELADO -->
         <div id="screen-reveal" class="screen">
             <div style="text-align:center;">
-                <p class="subtitle">Turno de:</p>
+                <p class="subtitle" id="reveal-instr">Pasa el teléfono a:</p>
                 <h1 id="reveal-name">---</h1>
                 <div class="press-pad" id="main-pad">MANTÉN</div>
                 <div class="setup-group" style="min-height:80px; display:flex; align-items:center; justify-content:center;">
                     <div id="word-display" style="display:none; font-weight:bold; font-size:1.3rem;"></div>
-                    <div id="word-hint" class="subtitle">Presiona arriba para ver</div>
+                    <div id="word-hint" class="subtitle">Presiona para ver tu rol</div>
                 </div>
             </div>
             <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido</button>
         </div>
 
-        <!-- DEBATE -->
+        <!-- PANTALLA DEBATE -->
         <div id="screen-debate" class="screen">
             <div>
                 <h1 id="debate-title">DEBATE</h1>
                 <div class="timer-display" id="timer-val">02:00</div>
-                
-                <div id="chat-section" style="display:none;">
-                    <div class="chat-area" id="chat-msgs"></div>
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="chat-input" placeholder="Escribe..." style="flex-grow:1; padding:10px; border-radius:10px; border:none; background:#222; color:white;">
-                        <button class="btn" style="width:60px; margin:0;" onclick="sendMsg()">></button>
-                    </div>
-                </div>
-
-                <div id="host-vote-control" style="display:none; margin-top:10px;">
-                    <button class="btn btn-secondary" onclick="proposeVote()">Lanzar Votación</button>
-                </div>
             </div>
-            <button class="btn" id="btn-go-vote" onclick="showVoting()">Ir a Votar</button>
+            <button class="btn" onclick="showVoting()">Ir a Votar</button>
         </div>
 
-        <!-- VOTACIÓN -->
+        <!-- PANTALLA VOTACIÓN -->
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
-                <p id="vote-instr" class="subtitle">Selecciona a quien expulsar</p>
-                <div id="vote-list"></div>
+                <p class="subtitle">Selecciona a quién expulsar</p>
+                <div id="vote-list" style="max-height:300px; overflow-y:auto;"></div>
             </div>
             <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar Voto</button>
         </div>
 
-        <!-- RESULTADOS -->
+        <!-- PANTALLA RESULTADO -->
         <div id="screen-result" class="screen">
             <div style="text-align:center;">
                 <div id="res-icon" style="font-size:4rem;">🕵️‍♂️</div>
@@ -259,329 +235,3 @@
         </div>
 
     </div>
-
-    <script>
-        // DATOS
-        const words = {
-            "Deportes": [{ a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" }],
-            "Comidas": [{ a: "Pizza", b: "Helado" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" }],
-            "Lugares": [{ a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }],
-            "Animales": [{ a: "León", b: "Gato" }, { a: "Delfín", b: "Tiburón" }]
-        };
-
-        let state = {
-            mode: 'single', // 'single' o 'multi'
-            multiType: 'cards',
-            players: [], // {id, name, role, isAlive, conn}
-            category: 'Deportes',
-            wordPair: null,
-            impostorIdx: -1,
-            currentIdx: 0,
-            timer: 120,
-            isHost: false,
-            votedIdx: null,
-            me: null
-        };
-
-        let peer = null;
-        let connections = [];
-
-        // NAVEGACIÓN
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.remove('active');
-                setTimeout(() => s.style.display = 'none', 300);
-            });
-            const next = document.getElementById(id);
-            next.style.display = 'flex';
-            setTimeout(() => next.classList.add('active'), 50);
-        }
-
-        // SINGLE PLAYER LOGIC
-        function startSinglePlayer() {
-            state.mode = 'single';
-            renderCategories();
-            switchScreen('screen-setup');
-        }
-
-        function changeCount(v) {
-            let n = parseInt(document.getElementById('player-count-val').textContent);
-            n = Math.max(3, Math.min(12, n + v));
-            document.getElementById('player-count-val').textContent = n;
-        }
-
-        function renderCategories() {
-            const grid = document.getElementById('cat-grid-single');
-            grid.innerHTML = '';
-            Object.keys(words).forEach(c => {
-                const el = document.createElement('div');
-                el.className = `option-card ${state.category === c ? 'selected' : ''}`;
-                el.textContent = c;
-                el.onclick = () => {
-                    state.category = c;
-                    renderCategories();
-                };
-                grid.appendChild(el);
-            });
-        }
-
-        function goToNames() {
-            const n = parseInt(document.getElementById('player-count-val').textContent);
-            const cont = document.getElementById('names-container');
-            cont.innerHTML = '';
-            for(let i=0; i<n; i++) {
-                cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="btn btn-secondary" style="color:white; text-align:left;">`;
-            }
-            switchScreen('screen-names');
-        }
-
-        function initSingleGame() {
-            const inputs = document.querySelectorAll('#names-container input');
-            state.players = Array.from(inputs).map((inp, i) => ({
-                name: inp.value, isAlive: true, role: 'innocent'
-            }));
-            state.impostorIdx = Math.floor(Math.random() * state.players.length);
-            state.players[state.impostorIdx].role = 'impostor';
-            const list = words[state.category];
-            state.wordPair = list[Math.floor(Math.random() * list.length)];
-            state.currentIdx = 0;
-            showReveal();
-        }
-
-        // REVELADO
-        function showReveal() {
-            switchScreen('screen-reveal');
-            document.getElementById('reveal-name').textContent = state.players[state.currentIdx].name;
-            document.getElementById('word-display').style.display = 'none';
-            document.getElementById('word-hint').style.display = 'block';
-            document.getElementById('btn-reveal-ok').style.display = 'none';
-            document.getElementById('main-pad').style.pointerEvents = 'auto';
-        }
-
-        const pad = document.getElementById('main-pad');
-        const press = () => {
-            const p = state.players[state.currentIdx];
-            const disp = document.getElementById('word-display');
-            disp.style.display = 'block';
-            document.getElementById('word-hint').style.display = 'none';
-            if(p.role === 'impostor') {
-                disp.innerHTML = `<span style="color:var(--danger)">IMPOSTOR</span><br><small>Apoyo: ${state.wordPair.b}</small>`;
-            } else {
-                disp.textContent = state.wordPair.a;
-            }
-        };
-        const release = () => {
-            document.getElementById('word-display').style.display = 'none';
-            document.getElementById('word-hint').style.display = 'block';
-            document.getElementById('word-hint').textContent = "¡Visto!";
-            document.getElementById('btn-reveal-ok').style.display = 'flex';
-            pad.style.pointerEvents = 'none';
-        };
-        pad.onmousedown = press; pad.onmouseup = release;
-        pad.ontouchstart = press; pad.ontouchend = release;
-
-        function nextReveal() {
-            state.currentIdx++;
-            if(state.currentIdx < state.players.length) showReveal();
-            else startDebate();
-        }
-
-        // DEBATE
-        function startDebate() {
-            switchScreen('screen-debate');
-            state.timer = 120;
-            if(window.tInterval) clearInterval(window.tInterval);
-            window.tInterval = setInterval(() => {
-                state.timer--;
-                let m = Math.floor(state.timer/60), s = state.timer%60;
-                document.getElementById('timer-val').textContent = `${m}:${s<10?'0'+s:s}`;
-                if(state.timer <= 0) { clearInterval(window.tInterval); showVoting(); }
-            }, 1000);
-            
-            if(state.mode === 'multi') {
-                document.getElementById('btn-go-vote').style.display = 'none';
-                if(state.isHost) document.getElementById('host-vote-control').style.display = 'block';
-                if(state.multiType === 'chat') document.getElementById('chat-section').style.display = 'block';
-            }
-        }
-
-        // VOTACIÓN
-        function showVoting() {
-            switchScreen('screen-vote');
-            const list = document.getElementById('vote-list');
-            list.innerHTML = '';
-            state.votedIdx = null;
-            document.getElementById('btn-confirm-vote').disabled = true;
-
-            state.players.forEach((p, i) => {
-                const el = document.createElement('div');
-                el.className = `vote-item ${p.isAlive ? '' : 'dead'}`;
-                el.innerHTML = `<span>${p.name}</span> <span>${p.isAlive?'Vivo':'FUERA'}</span>`;
-                if(p.isAlive) {
-                    el.onclick = () => {
-                        document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
-                        el.classList.add('selected');
-                        state.votedIdx = i;
-                        document.getElementById('btn-confirm-vote').disabled = false;
-                    };
-                }
-                list.appendChild(el);
-            });
-        }
-
-        function confirmVote() {
-            const p = state.players[state.votedIdx];
-            if(p.role === 'impostor') {
-                endGame(true);
-            } else {
-                p.isAlive = false;
-                const aliveInnocents = state.players.filter(pl => pl.isAlive && pl.role === 'innocent').length;
-                if(aliveInnocents <= 1) {
-                    endGame(false);
-                } else {
-                    alert(`¡${p.name} era Inocente! Quedan ${aliveInnocents}.`);
-                    startDebate();
-                }
-            }
-        }
-
-        function endGame(innocentsWin) {
-            switchScreen('screen-result');
-            const title = document.getElementById('res-title');
-            if(innocentsWin) {
-                title.textContent = "INOCENTES GANAN";
-                title.style.color = "var(--success)";
-            } else {
-                title.textContent = "IMPOSTOR GANA";
-                title.style.color = "var(--danger)";
-            }
-            document.getElementById('res-summary').innerHTML = `
-                <p>Palabra: <b>${state.wordPair.a}</b></p>
-                <p>Impostor: <b>${state.players.find(pl=>pl.role==='impostor').name}</b></p>
-            `;
-        }
-
-        // --- MULTIJUGADOR (PEERJS) ---
-
-        function hostGame() {
-            const name = document.getElementById('multi-name').value;
-            if(!name) return alert("Ponte un nombre");
-            state.isHost = true;
-            state.me = { name, id: 'host' };
-            state.players = [{ name, isAlive: true, role: 'innocent', id: 'host' }];
-            
-            const roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
-            peer = new Peer("IMPOSTOR-" + roomId);
-            
-            peer.on('open', (id) => {
-                document.getElementById('display-room-id').textContent = id.replace("IMPOSTOR-","");
-                switchScreen('screen-lobby');
-                document.getElementById('host-only-settings').style.display = 'block';
-                document.getElementById('btn-start-multi').style.display = 'block';
-                updatePlayerList();
-            });
-
-            peer.on('connection', (c) => {
-                c.on('data', (data) => {
-                    if(data.type === 'JOIN') {
-                        const newP = { name: data.name, id: c.peer, isAlive: true, role: 'innocent', conn: c };
-                        state.players.push(newP);
-                        connections.push(c);
-                        broadcast({ type: 'LIST', players: state.players.map(p=>({name:p.name})) });
-                        updatePlayerList();
-                        if(state.players.length >= 3) document.getElementById('btn-start-multi').disabled = false;
-                    }
-                });
-            });
-        }
-
-        function joinGame() {
-            const name = document.getElementById('multi-name').value;
-            const code = document.getElementById('join-id').value.toUpperCase();
-            if(!name || !code) return alert("Falta nombre o código");
-            
-            peer = new Peer();
-            peer.on('open', () => {
-                const c = peer.connect("IMPOSTOR-" + code);
-                c.on('open', () => {
-                    c.send({ type: 'JOIN', name });
-                    state.isHost = false;
-                    switchScreen('screen-lobby');
-                    document.getElementById('display-room-id').textContent = code;
-                });
-                c.on('data', (data) => {
-                    if(data.type === 'LIST') updatePlayerListClient(data.players);
-                    if(data.type === 'START') {
-                        state.mode = 'multi';
-                        state.wordPair = data.wordPair;
-                        state.players = data.players;
-                        state.multiType = data.multiType;
-                        // Encontrar mi rol
-                        const myInfo = data.players.find(p => p.name === name);
-                        state.players[0] = myInfo; // Hack para usar la misma lógica de revelado
-                        state.currentIdx = 0;
-                        showRevealMulti();
-                    }
-                });
-            });
-        }
-
-        function broadcast(data) {
-            connections.forEach(c => c.send(data));
-        }
-
-        function updatePlayerList() {
-            const cont = document.getElementById('player-list-multi');
-            cont.innerHTML = state.players.map(p => `<div>• ${p.name}</div>`).join('');
-        }
-
-        function updatePlayerListClient(list) {
-            const cont = document.getElementById('player-list-multi');
-            cont.innerHTML = list.map(p => `<div>• ${p.name}</div>`).join('');
-        }
-
-        function setMultiMode(m) {
-            state.multiType = m;
-            document.querySelectorAll('#host-only-settings .option-card').forEach(el=>el.classList.remove('selected'));
-            document.getElementById('opt-'+m).classList.add('selected');
-        }
-
-        function startMultiGame() {
-            state.mode = 'multi';
-            state.impostorIdx = Math.floor(Math.random() * state.players.length);
-            const list = words["Deportes"]; // Simplificado para el ejemplo
-            state.wordPair = list[Math.floor(Math.random() * list.length)];
-            
-            state.players.forEach((p, i) => {
-                p.role = (i === state.impostorIdx) ? 'impostor' : 'innocent';
-            });
-
-            // Enviar a todos
-            state.players.forEach((p, i) => {
-                if(p.id !== 'host') {
-                    p.conn.send({ 
-                        type: 'START', 
-                        wordPair: state.wordPair, 
-                        players: state.players.map(pl => ({name: pl.name, role: pl.role, isAlive: true})),
-                        multiType: state.multiType
-                    });
-                }
-            });
-
-            // Yo como host
-            state.currentIdx = 0;
-            showRevealMulti();
-        }
-
-        function showRevealMulti() {
-            switchScreen('screen-reveal');
-            document.getElementById('reveal-name').textContent = "TU PALABRA";
-            document.getElementById('btn-reveal-ok').onclick = () => startDebate();
-        }
-        
-        // El resto de la lógica de votación y consenso multijugador se basa en el Host 
-        // enviando comandos TYPE: 'VOTE_NOW' y TYPE: 'RESULT' de forma similar.
-
-    </script>
-</body>
-</html>
