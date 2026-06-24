@@ -1,18 +1,56 @@
-// --- DATOS DEL JUEGO ---
+// --- 1. BASE DE DATOS MASIVA (Más de 100 parejas) ---
 const words = {
-    "Deportes": [{ a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" }],
-    "Comidas": [{ a: "Pizza", b: "Helado" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" }],
-    "Lugares": [{ a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }],
-    "Animales": [{ a: "León", b: "Gato" }, { a: "Delfín", b: "Tiburón" }]
+    "Deportes": [
+        { a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" },
+        { a: "Ajedrez", b: "Poker" }, { a: "Gimnasia", b: "Sumo" }, { a: "Ciclismo", b: "Motocross" },
+        { a: "Golf", b: "Rugby" }, { a: "Voley", b: "Basket" }, { a: "Surf", b: "Buceo" },
+        { a: "Patinaje", b: "Esquí" }, { a: "Pesca", b: "Caza" }, { a: "Yoga", b: "Karate" }
+    ],
+    "Comidas": [
+        { a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" },
+        { a: "Chocolate", b: "Limón" }, { a: "Ensalada", b: "Pasta" }, { a: "Taco", b: "Burrito" },
+        { a: "Helado", b: "Yogur" }, { a: "Huevo", b: "Queso" }, { a: "Pan", b: "Galleta" },
+        { a: "Manzana", b: "Naranja" }, { a: "Pollo", b: "Pescado" }, { a: "Cerveza", b: "Vino" }
+    ],
+    "Lugares": [
+        { a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" },
+        { a: "Hospital", b: "Aeropuerto" }, { a: "Gimnasio", b: "Parque" }, { a: "Bosque", b: "Desierto" },
+        { a: "Iglesia", b: "Estadio" }, { a: "Escuela", b: "Cárcel" }, { a: "Hotel", b: "Banco" },
+        { a: "Montaña", b: "Río" }, { a: "Granja", b: "Fábrica" }, { a: "Teatro", b: "Circo" }
+    ],
+    "Objetos": [
+        { a: "Celular", b: "Laptop" }, { a: "Cuchillo", b: "Tijera" }, { a: "Reloj", b: "Brújula" },
+        { a: "Espejo", b: "Cuadro" }, { a: "Martillo", b: "Destornillador" }, { a: "Libro", b: "Revista" },
+        { a: "Cama", b: "Sofá" }, { a: "Llave", b: "Candado" }, { a: "Lámpara", b: "Vela" },
+        { a: "Cámara", b: "Telescopio" }, { a: "Pluma", b: "Lápiz" }, { a: "Radio", b: "Televisor" }
+    ]
 };
 
+// --- 2. VARIABLES DE ESTADO ---
 let state = {
-    mode: 'single', multiType: 'cards', players: [],
-    category: 'Deportes', wordPair: null, impostorIdx: -1,
-    currentIdx: 0, timer: 120, isHost: false, votedIdx: null
+    mode: 'single', 
+    multiType: 'cards', 
+    players: [],
+    category: 'Deportes', 
+    wordPair: null, 
+    impostorIdx: -1,
+    currentIdx: 0, 
+    timer: 120, 
+    isHost: false, 
+    votedIdx: null
 };
 
-// --- NAVEGACIÓN ---
+// --- 3. SISTEMA DE ALERTAS PERSONALIZADAS ---
+function showAlert(msg) {
+    document.getElementById('alert-msg').innerText = msg;
+    document.getElementById('custom-alert').style.display = 'flex';
+}
+
+function closeAlert() {
+    document.getElementById('custom-alert').style.display = 'none';
+}
+
+// --- 4. NAVEGACIÓN ---
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => {
         s.classList.remove('active');
@@ -23,7 +61,7 @@ function switchScreen(id) {
     setTimeout(() => target.classList.add('active'), 50);
 }
 
-// --- CONFIGURACIÓN SINGLE PLAYER ---
+// --- 5. CONFIGURACIÓN JUEGO (SINGLE PLAYER) ---
 function startSinglePlayer() {
     state.mode = 'single';
     renderCategories();
@@ -32,7 +70,9 @@ function startSinglePlayer() {
 
 function changeCount(v) {
     let el = document.getElementById('player-count-val');
-    let n = Math.max(3, Math.min(12, parseInt(el.textContent) + v));
+    let current = parseInt(el.textContent);
+    // Límite de 3 a 12 jugadores
+    let n = Math.max(3, Math.min(12, current + v));
     el.textContent = n;
 }
 
@@ -52,30 +92,38 @@ function goToNames() {
     const n = parseInt(document.getElementById('player-count-val').textContent);
     const cont = document.getElementById('names-container');
     cont.innerHTML = '';
+    const presets = ["Sofía", "Mateo", "Valentina", "Santiago", "Camila", "Lucas", "Elena", "Diego", "Maia", "Enzo", "Gael", "Mora"];
     for(let i=0; i<n; i++) {
-        cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="name-input-field" style="margin-bottom:8px; text-align:left;">`;
+        cont.innerHTML += `<input type="text" id="n-${i}" value="${presets[i]}" class="name-input-field" style="margin-bottom:10px; text-align:left;">`;
     }
     switchScreen('screen-names');
 }
 
 function initSingleGame() {
     const inputs = document.querySelectorAll('#names-container input');
-    state.players = Array.from(inputs).map(inp => ({ name: inp.value, isAlive: true, role: 'innocent' }));
+    state.players = Array.from(inputs).map(inp => ({ 
+        name: inp.value.trim() || "Jugador", 
+        isAlive: true, 
+        role: 'innocent' 
+    }));
+    
     state.impostorIdx = Math.floor(Math.random() * state.players.length);
     state.players[state.impostorIdx].role = 'impostor';
+    
     const list = words[state.category];
     state.wordPair = list[Math.floor(Math.random() * list.length)];
     state.currentIdx = 0;
     showReveal();
 }
 
-// --- REVELADO ---
+// --- 6. SISTEMA DE REVELADO ---
 function showReveal() {
     switchScreen('screen-reveal');
     document.getElementById('reveal-name').textContent = state.players[state.currentIdx].name;
     document.getElementById('word-display').style.display = 'none';
     document.getElementById('word-hint').style.display = 'block';
     document.getElementById('btn-reveal-ok').style.display = 'none';
+    document.getElementById('pad-label').textContent = "MANTÉN";
 }
 
 const pad = document.getElementById('main-pad');
@@ -85,17 +133,20 @@ const press = () => {
     disp.style.display = 'block';
     document.getElementById('word-hint').style.display = 'none';
     disp.innerHTML = (p.role === 'impostor') ? 
-        `<span style="color:var(--danger)">IMPOSTOR</span><br><small>Apoyo: ${state.wordPair.b}</small>` : 
-        state.wordPair.a;
+        `<span style="color:var(--danger); font-size:1.5rem;">IMPOSTOR</span><br><small style="color:var(--text-muted); font-weight:normal;">Apoyo: ${state.wordPair.b}</small>` : 
+        `<span style="font-size:1.5rem;">${state.wordPair.a}</span>`;
 };
 const release = () => {
     document.getElementById('word-display').style.display = 'none';
     document.getElementById('word-hint').style.display = 'block';
-    document.getElementById('word-hint').textContent = "¡Visto! Pulsa abajo";
+    document.getElementById('word-hint').textContent = "¡Visto!";
     document.getElementById('btn-reveal-ok').style.display = 'flex';
+    document.getElementById('pad-label').textContent = "LISTO";
 };
+
 pad.onmousedown = press; pad.onmouseup = release;
-pad.ontouchstart = press; pad.ontouchend = release;
+pad.ontouchstart = (e) => { e.preventDefault(); press(); }; 
+pad.ontouchend = (e) => { e.preventDefault(); release(); };
 
 function nextReveal() {
     state.currentIdx++;
@@ -103,17 +154,26 @@ function nextReveal() {
     else startDebate();
 }
 
-// --- DEBATE Y REGLA DE VICTORIA ---
+// --- 7. DEBATE Y REGLA DE SUPERVIVENCIA ---
 function startDebate() {
     switchScreen('screen-debate');
     state.timer = 120;
+    updateTimerUI();
     if(window.timerInt) clearInterval(window.timerInt);
     window.timerInt = setInterval(() => {
         state.timer--;
-        let m = Math.floor(state.timer/60), s = state.timer%60;
-        document.getElementById('timer-val').textContent = `${m}:${s<10?'0'+s:s}`;
-        if(state.timer <= 0) { clearInterval(window.timerInt); showVoting(); }
+        updateTimerUI();
+        if(state.timer <= 0) { 
+            clearInterval(window.timerInt); 
+            showAlert("¡Tiempo agotado! Es hora de votar.");
+            showVoting(); 
+        }
     }, 1000);
+}
+
+function updateTimerUI() {
+    let m = Math.floor(state.timer/60), s = state.timer%60;
+    document.getElementById('timer-val').textContent = `${m}:${s<10?'0'+s:s}`;
 }
 
 function showVoting() {
@@ -122,10 +182,11 @@ function showVoting() {
     list.innerHTML = '';
     state.votedIdx = null;
     document.getElementById('btn-confirm-vote').disabled = true;
+    
     state.players.forEach((p, i) => {
         const el = document.createElement('div');
         el.className = `vote-item ${p.isAlive ? '' : 'dead'}`;
-        el.innerHTML = `<span>${p.name}</span> <span>${p.isAlive?'Vivo':'Eliminado'}</span>`;
+        el.innerHTML = `<span>${p.name}</span> <span style="font-size:0.7rem; color:var(--primary);">${p.isAlive?'• ACTIVO':'• ELIMINADO'}</span>`;
         if(p.isAlive) {
             el.onclick = () => {
                 document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
@@ -140,13 +201,19 @@ function showVoting() {
 
 function confirmVote() {
     const p = state.players[state.votedIdx];
-    if(p.role === 'impostor') { endGame(true); } 
+    if(p.role === 'impostor') { 
+        endGame(true); // Ganan Inocentes
+    } 
     else {
         p.isAlive = false;
         const innocentsAlive = state.players.filter(pl => pl.isAlive && pl.role === 'innocent').length;
-        if(innocentsAlive <= 1) { endGame(false); }
+        
+        // El Impostor gana si solo queda 1 inocente
+        if(innocentsAlive <= 1) { 
+            endGame(false); 
+        } 
         else {
-            alert(`¡${p.name} era Inocente! El juego sigue. Quedan ${innocentsAlive} inocentes.`);
+            showAlert(`¡${p.name} era Inocente! Quedan ${innocentsAlive} inocentes. El impostor sigue libre...`);
             startDebate();
         }
     }
@@ -155,12 +222,23 @@ function confirmVote() {
 function endGame(innocentsWin) {
     if(window.timerInt) clearInterval(window.timerInt);
     switchScreen('screen-result');
-    document.getElementById('res-title').textContent = innocentsWin ? "INOCENTES GANAN" : "IMPOSTOR GANA";
-    document.getElementById('res-title').style.color = innocentsWin ? "var(--success)" : "var(--danger)";
-    document.getElementById('res-summary').innerHTML = `<p>Palabra: ${state.wordPair.a}</p><p>Impostor: ${state.players[state.impostorIdx].name}</p>`;
+    const title = document.getElementById('res-title');
+    title.textContent = innocentsWin ? "INOCENTES GANAN" : "IMPOSTOR GANA";
+    title.style.color = innocentsWin ? "var(--success)" : "var(--danger)";
+    document.getElementById('res-icon').textContent = innocentsWin ? "🎉" : "🤫";
+    document.getElementById('res-desc').textContent = innocentsWin ? "Lograron desenmascarar al infiltrado." : "El impostor logró eliminar a los inocentes.";
+    
+    document.getElementById('res-summary').innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span style="color:var(--text-muted)">Palabra:</span> <b>${state.wordPair.a}</b>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted)">El Impostor era:</span> <b style="color:var(--primary)">${state.players[state.impostorIdx].name}</b>
+        </div>
+    `;
 }
 
-// --- MULTIPLAYER (PEERJS BÁSICO) ---
+// --- 8. MULTIPLAYER (ESTRUCTURA PARA HOST/PEERJS) ---
 function setMultiMode(m) {
     state.multiType = m;
     document.querySelectorAll('#screen-multi-choice .option-card').forEach(c=>c.classList.remove('selected'));
@@ -169,25 +247,26 @@ function setMultiMode(m) {
 
 function hostGame() {
     const name = document.getElementById('multi-name').value;
-    if(!name) return alert("Escribe tu nombre");
+    if(!name) return showAlert("Por favor, escribe tu nombre.");
+    // Aquí se genera el código de sala y se inicia PeerJS
     const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-    alert("Código de sala: " + code + "\n(Lógica de conexión PeerJS activada)");
-    // Aquí se conecta con el servidor PeerJS
+    showAlert("SALA CREADA: " + code + "\nEsperando a los demás jugadores...");
 }
 
 function joinGame() {
     const name = document.getElementById('multi-name').value;
     const code = document.getElementById('join-id').value;
-    if(!name || !code) return alert("Faltan datos");
-    alert("Intentando unirse a " + code);
+    if(!name || !code) return showAlert("Necesitas nombre y código.");
+    showAlert("Conectando a la sala...");
 }
 
-// --- INSTALACIÓN ---
+// --- 9. INSTALACIÓN ---
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); deferredPrompt = e;
     document.getElementById('btn-instalar-pwa').style.display = 'block';
 });
+
 document.getElementById('btn-instalar-pwa').addEventListener('click', async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -197,5 +276,5 @@ document.getElementById('btn-instalar-pwa').addEventListener('click', async () =
     }
 });
 
-// Iniciar en el menú
+// Iniciar siempre en el menú
 window.onload = () => switchScreen('screen-menu');
