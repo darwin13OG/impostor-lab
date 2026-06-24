@@ -1,0 +1,87 @@
+:root {
+    --bg-color: #08080c;
+    --card-bg: #11111a;
+    --card-border: #1e1e2f;
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-glow: rgba(139, 92, 246, 0.4);
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --danger: #ef4444;
+    --success: #10b981;
+}
+
+* {
+    box-sizing: border-box; margin: 0; padding: 0;
+    font-family: sans-serif; -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color); color: var(--text-main);
+    min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 1rem;
+}
+
+.game-container {
+    width: 100%; max-width: 450px; background-color: var(--card-bg);
+    border: 1px solid var(--card-border); border-radius: 28px;
+    padding: 2rem; height: 90vh; max-height: 680px;
+    display: flex; flex-direction: column; position: relative; overflow: hidden;
+}
+
+.screen {
+    display: none; flex-direction: column; justify-content: space-between;
+    height: 100%; opacity: 0; transition: opacity 0.3s ease;
+}
+
+.screen.active { display: flex; opacity: 1; }
+
+h1 span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+.subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+.btn {
+    background: var(--primary); color: white; border: none; padding: 1rem;
+    border-radius: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 0.5rem;
+}
+
+.btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); padding: 1rem; border-radius: 14px; width: 100%; cursor: pointer; margin-bottom: 0.5rem; }
+
+.btn:disabled { background: #2e2e3e; color: #555; }
+
+.setup-group { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 1rem; margin-bottom: 1rem; }
+
+.option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+
+.option-card {
+    background: rgba(255,255,255,0.01); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 0.8rem; text-align: center; cursor: pointer; font-size: 0.8rem;
+}
+
+.option-card.selected { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
+
+.mini-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+
+.main-logo { width: 80px; border-radius: 20px; margin-bottom: 1rem; }
+
+.num-selector { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+.btn-small { width: 45px; height: 45px; background: var(--card-border); border: none; color: white; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
+
+.scroll-area { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+
+.press-pad { width: 130px; height: 130px; border-radius: 50%; border: 4px dashed var(--primary); margin: 1.5rem auto; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; }
+
+.word-box { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; min-height: 80px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
+
+.timer-display { font-size: 3.5rem; font-weight: 800; text-align: center; color: var(--primary); margin: 1rem 0; }
+
+.vote-item { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); padding: 1rem; border-radius: 12px; margin-bottom: 0.5rem; cursor: pointer; display: flex; justify-content: space-between; }
+
+.vote-item.selected { border-color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+
+.vote-item.dead { opacity: 0.3; text-decoration: line-through; }
+
+#btn-instalar-pwa { position: fixed; top: 15px; right: 15px; background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: none; cursor: pointer; z-index: 100; }
+
+.name-input-field { width: 100%; padding: 12px; border-radius: 10px; border: none; background: #222; color: white; text-align: center; }
+
+.code-input-field { width: 50%; padding: 12px; border-radius: 10px; border: none; background: #222; color: white; text-align: center; }
