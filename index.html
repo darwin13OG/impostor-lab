@@ -56,7 +56,6 @@
             position: relative;
         }
 
-        /* Estructura de Pantallas con Transiciones */
         .screen {
             display: none;
             flex-direction: column;
@@ -64,8 +63,7 @@
             flex-grow: 1;
             opacity: 0;
             transform: scale(0.98) translateY(8px);
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .screen.active {
@@ -74,989 +72,216 @@
             transform: scale(1) translateY(0);
         }
 
-        h1 {
-            font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: 0.5rem;
-            color: #ffffff;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-        }
+        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 0.5rem; color: #ffffff; font-weight: 800; }
+        h1 span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+        p.subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
 
-        h1 span {
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.4;
-        }
-
-        /* Botones Generales */
         .btn {
             background-color: var(--primary);
             color: #ffffff;
             border: none;
-            padding: 1rem 1.5rem;
+            padding: 1rem;
             border-radius: 14px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            margin-bottom: 0.5rem;
         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--primary-glow);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        .btn:disabled {
-            background-color: #2e2e3e;
-            color: var(--text-muted);
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--card-border);
-            color: var(--text-muted);
-            box-shadow: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--card-border);
-            color: var(--text-main);
-        }
-
-        /* Selectores y Formularios */
-        .setup-group {
-            background-color: rgba(255, 255, 255, 0.015);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .label-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--primary);
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
-        .number-selector {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .num-btn {
-            background-color: var(--card-border);
-            border: none;
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-        }
-
-        .num-btn:hover {
-            background-color: var(--primary);
-        }
-
-        .num-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        /* Grid de Modos y Categorías */
-        .option-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .option-card {
-            background-color: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 0.85rem;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-        }
-
-        .option-card.selected {
-            background-color: rgba(139, 92, 246, 0.08);
-            border-color: var(--primary);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.15);
-        }
-
-        /* Lista de Nombres de Jugadores */
-        .names-list {
-            max-height: 250px;
-            overflow-y: auto;
-            margin: 1rem 0;
-            padding-right: 0.25rem;
-        }
-
-        .names-list::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .names-list::-webkit-scrollbar-thumb {
-            background: var(--card-border);
-            border-radius: 3px;
-        }
-
-        .name-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            background-color: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--card-border);
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-        }
-
-        .name-input-wrapper span {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 0.9rem;
-            min-width: 24px;
-        }
-
-        .name-input {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 1rem;
-            font-weight: 600;
-            width: 100%;
-            outline: none;
-        }
-
-        /* Pantallas de Transmisión y Revelado */
-        .reveal-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-            margin: 1.5rem 0;
-        }
-
-        .security-title {
-            font-size: 1.4rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--text-muted);
-        }
-
-        .security-name {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary-glow);
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .press-pad {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--primary) 0%, rgba(13, 14, 21, 0.4) 100%);
-            border: 4px dashed var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.15);
-            margin: 1.5rem 0;
-        }
-
-        .press-pad:active {
-            transform: scale(0.92);
-            box-shadow: 0 0 35px var(--primary-glow);
-            border-style: solid;
-        }
-
-        .pad-text {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-align: center;
-            pointer-events: none;
-            letter-spacing: 0.05em;
-        }
-
-        .word-container {
-            background-color: rgba(255, 255, 255, 0.015);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 1.25rem;
-            width: 100%;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .word-text-display {
-            font-size: 1.4rem;
-            font-weight: 700;
-            display: none;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        .word-prompt {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .danger-text {
-            color: var(--danger);
-            text-shadow: 0 0 10px var(--danger-glow);
-            font-weight: 800;
-        }
-
-        /* Temporizador */
-        .timer-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-
-        .timer-circle {
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            border: 6px solid var(--card-border);
-            border-top-color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-            animation: pulse-border 2s infinite;
-        }
-
-        @keyframes pulse-border {
-            0%, 100% { border-color: var(--card-border); border-top-color: var(--primary); }
-            50% { border-color: #2e2e3e; border-top-color: var(--primary-hover); }
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 0.5rem;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        /* Banner de Reglas de Juego para el Debate */
-        .rule-banner {
-            background-color: rgba(139, 92, 246, 0.05);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-align: center;
-            line-height: 1.3;
-            margin-bottom: 1rem;
-        }
-
-        .rule-banner strong {
-            color: var(--primary);
-        }
-
-        /* Lista de Votos */
-        .vote-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin: 1rem 0;
-            max-height: 280px;
-            overflow-y: auto;
-        }
-
-        .vote-item {
-            background-color: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--card-border);
-            padding: 0.85rem 1.25rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .vote-item.selected {
-            border-color: var(--danger);
-            background-color: rgba(239, 68, 68, 0.05);
-        }
-
-        .player-color-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            box-shadow: 0 0 8px var(--primary);
-        }
-
-        /* Resultados Finales */
-        .result-info {
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .icon-result {
-            font-size: 3.5rem;
-        }
-
-        .title-result {
-            font-size: 2rem;
-            font-weight: 800;
-        }
-
-        .desc-result {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.4;
-            max-width: 320px;
-        }
-
-        .summary-box {
-            background-color: rgba(255, 255, 255, 0.015);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
+        
+        /* Estilos específicos para modo Local */
+        .room-code-display {
+            background: #1a1a2e;
             padding: 1rem;
-            width: 100%;
-            margin-top: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            margin: 1rem 0;
         }
 
-        .summary-line {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
+        .chat-box {
+            height: 200px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid var(--card-border);
         }
 
-        .summary-line:last-child {
-            margin-bottom: 0;
-        }
+        .msg { margin-bottom: 8px; font-size: 0.85rem; }
+        .msg.host { color: var(--primary); }
 
-        /* Animación Fade In */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* Lo que ya tenías de inputs y grids */
+        .setup-group { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; }
+        .number-selector { display: flex; justify-content: space-between; align-items: center; }
+        .num-btn { background: var(--card-border); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; }
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+        .option-card { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; text-align: center; cursor: pointer; font-size: 0.85rem; }
+        .option-card.selected { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
+        
+        /* Votación y resultados */
+        .vote-item { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); padding: 0.85rem; border-radius: 12px; margin-bottom: 0.5rem; cursor: pointer; display: flex; justify-content: space-between; }
+        .vote-item.selected { border-color: var(--danger); }
+        .vote-item.eliminated { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+        .press-pad { width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--primary); margin: 2rem auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .word-container { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 1rem; min-height: 80px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .timer-circle { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--primary); margin: 1rem auto; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
     </style>
 </head>
 <body>
-    
-    <!-- Botón flotante para instalar la App -->
-<button id="btn-instalar-pwa" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; background: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
-    📥 Instalar App
-</button>
-    
 
     <div class="game-container">
-
-        <!-- PANTALLA 1: AJUSTES E INICIO -->
-        <div id="screen-setup" class="screen active">
-            <div>
+        
+        <!-- PANTALLA 0: MENÚ PRINCIPAL -->
+        <div id="screen-main" class="screen active">
+            <div style="text-align: center;">
+                <img src="icono.png" alt="Logo" style="width: 100px; margin-bottom: 1rem; border-radius: 20px;">
                 <h1>EL <span>IMPOSTOR</span></h1>
-                <p class="subtitle">Descubre al infiltrado antes de que sea tarde</p>
+                <p class="subtitle">Descubre al infiltrado</p>
+                
+                <div style="margin-top: 2rem;">
+                    <button class="btn" onclick="goToMode('single')">📱 Un solo celular</button>
+                    <button class="btn btn-secondary" onclick="goToMode('multi')">🌐 Varios celulares (Local)</button>
+                </div>
+            </div>
+        </div>
 
-                <!-- Cantidad Jugadores -->
+        <!-- PANTALLA 1: AJUSTES (Single Device) -->
+        <div id="screen-setup" class="screen">
+            <div>
+                <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span class="label-title">Jugadores</span>
+                    <span style="font-size:0.8rem; color:var(--primary);">JUGADORES</span>
                     <div class="number-selector">
                         <button class="num-btn" onclick="modifyPlayerCount(-1)">-</button>
-                        <span id="display-player-count" class="num-value">4</span>
+                        <span id="display-player-count" style="font-size:1.5rem; font-weight:bold;">4</span>
                         <button class="num-btn" onclick="modifyPlayerCount(1)">+</button>
                     </div>
                 </div>
-
-                <!-- Modo de Juego -->
-                <span class="label-title">Modo de Juego</span>
-                <div class="option-grid" id="mode-grid">
-                    <div class="option-card selected" onclick="setGameMode('impostor')">
-                        Impostor Original
-                        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal; margin-top:3px;">Tiene palabra de apoyo</div>
-                    </div>
-                    <div class="option-card" onclick="setGameMode('infiltrado')">
-                        Infiltrado
-                        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal; margin-top:3px;">Incertidumbre total</div>
-                    </div>
-                    <div class="option-card" onclick="setGameMode('espia')" style="grid-column: span 2;">
-                        Espía sin Palabra
-                        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal; margin-top:3px;">No sabe nada, debe simular</div>
-                    </div>
-                </div>
-
-                <!-- Categorías -->
-                <span class="label-title">Categoría</span>
-                <div class="option-grid" id="category-grid">
-                    <!-- Dinámico -->
-                </div>
+                <div id="category-grid" class="option-grid"></div>
             </div>
-
             <button class="btn" onclick="goToNamesScreen()">Continuar</button>
         </div>
 
-
-        <!-- PANTALLA 1.5: INGRESO DE NOMBRES -->
-        <div id="screen-names" class="screen">
+        <!-- PANTALLA MULTIPLAYER: CREAR O UNIRSE -->
+        <div id="screen-multi-choice" class="screen">
             <div>
-                <h1>Nombres de <span>Jugadores</span></h1>
-                <p class="subtitle">Escribe los nombres de los participantes</p>
-
-                <div class="names-list" id="names-list-container">
-                    <!-- Dinámico -->
-                </div>
+                <h1>MODO <span>LOCAL</span></h1>
+                <p class="subtitle">¿Qué deseas hacer?</p>
+                <button class="btn" onclick="showCreateRoom()">Crear Partida (Host)</button>
+                <button class="btn btn-secondary" onclick="showJoinRoom()">Unirse a Partida</button>
             </div>
-
-            <div style="display:flex; gap:0.5rem;">
-                <button class="btn btn-secondary" onclick="goBackToSetup()">Atrás</button>
-                <button class="btn" onclick="initiateRolesDistribution()">Comenzar</button>
-            </div>
+            <button class="btn btn-secondary" onclick="resetToHome()">Atrás</button>
         </div>
 
+        <!-- PANTALLA LOBBY (HOST) -->
+        <div id="screen-lobby-host" class="screen">
+            <div>
+                <h1>SALA DE <span>ESPERA</span></h1>
+                <p class="subtitle">Comparte el código con tus amigos</p>
+                <div class="room-code-display" id="room-id-text">------</div>
+                
+                <div class="setup-group">
+                    <p style="font-size:0.8rem; margin-bottom:10px;">MODO DE JUEGO:</p>
+                    <div class="option-grid">
+                        <div id="m-cards" class="option-card selected" onclick="setMultiMode('cards')">Tarjetas (Cerca)</div>
+                        <div id="m-chat" class="option-card" onclick="setMultiMode('chat')">Chat (Lejos)</div>
+                    </div>
+                </div>
 
-        <!-- PANTALLA 2A: PASAR EL TELÉFONO (SEGURIDAD) -->
-        <div id="screen-transfer" class="screen">
-            <div class="reveal-box">
-                <div class="security-title">Pasa el dispositivo a:</div>
-                <div class="security-name" id="next-player-name">Nombre</div>
-                <div style="font-size: 4rem; margin: 2rem 0;">📱</div>
-                <p class="subtitle" style="max-width: 280px;">Asegúrate de que nadie más esté mirando la pantalla.</p>
+                <div id="player-list-multi" style="font-size:0.9rem; color:var(--text-muted);">
+                    Esperando jugadores... (0)
+                </div>
             </div>
+            <button class="btn" id="start-multi-btn" disabled>Empezar Partida</button>
+        </div>
 
+        <!-- PANTALLA DE REVELADO (Se usa en ambos modos) -->
+        <div id="screen-transfer" class="screen">
+            <div style="text-align:center;">
+                <p class="subtitle">Turno de:</p>
+                <h1 id="next-player-name">---</h1>
+                <div style="font-size:4rem; margin:2rem;">📱</div>
+            </div>
             <button class="btn" onclick="switchToHoldScreen()">Ya lo tengo</button>
         </div>
 
-
-        <!-- PANTALLA 2B: REVELADO (MANTENER PRESIONADO) -->
         <div id="screen-hold" class="screen">
-            <div class="reveal-box">
-                <div class="security-title" id="hold-player-title">Jugador</div>
-                
-                <div class="press-pad" id="touch-pad">
-                    <span class="pad-text" id="pad-instruction">MANTÉN<br>PRESIONADO</span>
-                </div>
-
+            <div style="text-align:center;">
+                <h2 id="hold-player-title">---</h2>
+                <div class="press-pad" id="touch-pad">MANTÉN</div>
                 <div class="word-container">
-                    <span class="word-prompt" id="word-prompt-text">Mantén pulsado arriba para revelar tu palabra</span>
-                    <span class="word-text-display" id="word-real-text">PALABRA</span>
+                    <span id="word-real-text" style="display:none; font-weight:bold; font-size:1.2rem;">PALABRA</span>
+                    <span id="word-prompt-text">Mantén para ver tu rol</span>
                 </div>
             </div>
-
-            <button class="btn" id="finish-reveal-btn" onclick="confirmAndNext()" style="display: none;">Entendido, ocultar</button>
+            <button class="btn" id="finish-reveal-btn" style="display:none;" onclick="confirmAndNext()">Entendido</button>
         </div>
 
-
-        <!-- PANTALLA 3: TEMPORIZADOR Y DEBATE -->
+        <!-- PANTALLA DE DEBATE / CHAT -->
         <div id="screen-debate" class="screen">
             <div>
-                <h1>Tiempo de <span>Debate</span></h1>
-                <p class="subtitle">Hagan preguntas cruzadas para identificar al infiltrado.</p>
-
-                <div class="timer-wrapper">
-                    <div class="timer-circle" id="timer-text">02:00</div>
-                    
-                    <!-- Banner estratégico para evitar soplos genéricos -->
-                    <div class="rule-banner">
-                        ⚠️ <strong>Regla del Debate:</strong> Evita pistas demasiado genéricas (ej. <em>"tiene un árbitro"</em>). Si eres muy vago al dar tu pista, el grupo sospechará que eres el Impostor. ¡Sé específico!
-                    </div>
-
-                    <div class="timer-controls">
-                        <button class="btn btn-secondary" onclick="alterTimer(-30)">-30s</button>
-                        <button class="btn btn-secondary" id="pause-btn" onclick="togglePauseTimer()">Pausar</button>
-                        <button class="btn btn-secondary" onclick="alterTimer(30)">+30s</button>
+                <h1 id="debate-title">DEBATE</h1>
+                <div class="timer-circle" id="timer-text">02:00</div>
+                
+                <!-- Este chat solo se ve en Modo Chat -->
+                <div id="chat-container" style="display:none;">
+                    <div class="chat-box" id="messages"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="chat-input" style="flex-grow:1; padding:10px; border-radius:10px; border:none; background:#222; color:white;">
+                        <button class="btn" style="width:60px; margin:0;" onclick="sendChat()">S</button>
                     </div>
                 </div>
-            </div>
 
-            <button class="btn" onclick="goToVotingScreen()">Ir a la Votación</button>
+                <div id="host-controls" style="display:none; margin-top:10px;">
+                    <button class="btn btn-secondary" onclick="requestVote()">Lanzar Votación</button>
+                </div>
+            </div>
+            <button class="btn" id="btn-to-vote" onclick="goToVotingScreen()">Ir a Votación</button>
         </div>
 
-
-        <!-- PANTALLA 4: VOTACIÓN -->
+        <!-- PANTALLA DE VOTACIÓN -->
         <div id="screen-vote" class="screen">
             <div>
-                <h1>¿Quién es el <span>Impostor</span>?</h1>
-                <p class="subtitle">Seleccionen de mutuo acuerdo al jugador sospechoso</p>
-
-                <div class="vote-list" id="vote-container">
-                    <!-- Dinámico -->
-                </div>
+                <h1>VOTACIÓN</h1>
+                <p class="subtitle">Seleccionen al sospechoso</p>
+                <div id="vote-container"></div>
             </div>
-
-            <button class="btn" id="confirm-vote-btn" onclick="processFinalResult()" disabled>Confirmar Eliminado</button>
+            <button class="btn" id="confirm-vote-btn" onclick="processFinalResult()" disabled>Confirmar</button>
         </div>
 
-
-        <!-- PANTALLA 5: RESULTADOS -->
+        <!-- RESULTADO FINAL -->
         <div id="screen-result" class="screen">
-            <div class="result-info">
-                <div class="icon-result" id="res-icon">🕵️‍♂️</div>
-                <div class="title-result" id="res-title">Resultado</div>
-                <div class="desc-result" id="res-desc">Descripción del resultado</div>
-
-                <div class="summary-box">
-                    <div class="summary-line">
-                        <span style="color: var(--text-muted)">Palabra Inocentes:</span>
-                        <strong id="summary-word-a">---</strong>
-                    </div>
-                    <div class="summary-line" id="summary-word-b-row">
-                        <span style="color: var(--text-muted)">Palabra Impostor:</span>
-                        <strong id="summary-word-b">---</strong>
-                    </div>
-                    <div class="summary-line">
-                        <span style="color: var(--text-muted)">El Impostor era:</span>
-                        <strong id="summary-impostor-name" style="color: var(--primary)">---</strong>
-                    </div>
-                </div>
+            <div style="text-align:center;">
+                <div id="res-icon" style="font-size:4rem;">🕵️‍♂️</div>
+                <h1 id="res-title">RESULTADO</h1>
+                <p id="res-desc" class="subtitle"></p>
+                <div class="setup-group" id="final-summary"></div>
             </div>
+            <button class="btn" onclick="resetToHome()">Volver al Inicio</button>
+        </div>
 
-            <button class="btn" onclick="resetToHome()">Volver a Jugar</button>
+        <!-- Pantalla de ingreso de nombres (Single) -->
+        <div id="screen-names" class="screen">
+            <div>
+                <h1>NOMBRES</h1>
+                <div id="names-list-container" style="max-height:300px; overflow-y:auto;"></div>
+            </div>
+            <button class="btn" onclick="initiateRolesDistribution()">Empezar</button>
         </div>
 
     </div>
-
-    <script>
-        // Base de Datos optimizada con parejas conceptuales contrastantes 
-        // (Mismo tema, pero diferencias de atributos muy marcadas para evitar pistas genéricas facilonas)
-        const wordDatabase = {
-            "Deportes": [
-                { a: "Fútbol", b: "Tenis" },          // Balón con el pie / Pelota pequeña con raqueta
-                { a: "Natación", b: "Alpinismo" },    // Agua en piscina / Montaña fría y rocosa
-                { a: "Boxeo", b: "Esgrima" },         // Puñetazos físicos / Espadas estilizadas con reglas de puntaje
-                { a: "Ajedrez", b: "Fórmula 1" },     // Silencioso mental / Ruido de motores extremo
-                { a: "Gimnasia", b: "Sumo" },         // Flexibilidad y ligereza / Peso pesado y fuerza bruta
-                { a: "Ciclismo", b: "Paracaidismo" }, // Ruedas en el suelo / Caída libre en el aire
-                { a: "Golf", b: "Rugby" }             // Silencioso e individual / Contacto rudo y en equipo
-            ],
-            "Comidas": [
-                { a: "Pizza", b: "Helado" },          // Caliente y salada / Helado y dulce
-                { a: "Sopa", b: "Café" },             // Alimento salado de cuchara / Bebida estimulante de taza
-                { a: "Sushi", b: "Asado" },           // Pescado crudo frío / Carne cocinada a la brasa caliente
-                { a: "Chocolate", b: "Limón" },       // Dulce y cremoso / Ácido y cítrico
-                { a: "Ensalada", b: "Hamburguesa" }   // Comida saludable y fresca / Comida rápida y grasosa
-            ],
-            "Lugares": [
-                { a: "Cine", b: "Playa" },            // Oscuro, cerrado y silencioso / Soleado, abierto y ruidoso
-                { a: "Biblioteca", b: "Discoteca" },  // Silencio estricto y libros / Música alta y baile
-                { a: "Zoológico", b: "Desierto" },    // Lleno de animales en cautiverio / Vacío y calor extremo sin fauna aparente
-                { a: "Hospital", b: "Aeropuerto" },   // Pacientes y medicina / Viajeros y aviones
-                { a: "Gimnasio", b: "Museo" }         // Ejercicio físico y sudor / Arte estático y cultura
-            ],
-            "Animales": [
-                { a: "León", b: "Gato Doméstico" },   // Feroz rey de la sabana / Mascota hogareña que maúlla
-                { a: "Delfín", b: "Tiburón" },        // Mamífero amigable / Depredador temido del océano
-                { a: "Águila", b: "Pingüino" },       // Ave majestuosa que vuela alto / Ave marina que no vuela y vive en el hielo
-                { a: "Camello", b: "Oso Polar" },     // Soporta calor del desierto / Soporta frío extremo del ártico
-                { a: "Murciélago", b: "Mariposa" }    // Nocturno y oscuro / Diurno, colorido y delicado
-            ]
-        };
-
-        const presetNames = [
-            "Sofía", "Mateo", "Valentina", "Santiago", "Camila", 
-            "Sebastián", "Isabella", "Lucas", "Mariana", "Diego", 
-            "Elena", "Nicolás", "Gabriela", "Samuel"
-        ];
-
-        let numPlayers = 4;
-        let selectedCategory = "Deportes";
-        let activeGameMode = "impostor"; 
-        let playerNames = [];
-        let impostorIndex = -1;
-        let wordPair = { a: "", b: "" };
-        let activePlayerIdx = 0;
-
-        let countdownSeconds = 120;
-        let timerId = null;
-        let timerPaused = false;
-        let votedPlayerIdx = null;
-
-        window.addEventListener("DOMContentLoaded", () => {
-            renderCategories();
-            bindTouchEvents();
-        });
-
-        function renderCategories() {
-            const container = document.getElementById("category-grid");
-            container.innerHTML = "";
-            Object.keys(wordDatabase).forEach((cat) => {
-                const card = document.createElement("div");
-                card.className = `option-card ${cat === selectedCategory ? 'selected' : ''}`;
-                card.textContent = cat;
-                card.onclick = () => {
-                    selectedCategory = cat;
-                    document.querySelectorAll("#category-grid .option-card").forEach(c => c.classList.remove("selected"));
-                    card.classList.add("selected");
-                };
-                container.appendChild(card);
-            });
-        }
-
-        function modifyPlayerCount(dir) {
-            const temp = numPlayers + dir;
-            if (temp >= 3 && temp <= 12) {
-                numPlayers = temp;
-                document.getElementById("display-player-count").textContent = numPlayers;
-            }
-        }
-
-        function setGameMode(mode) {
-            activeGameMode = mode;
-            document.querySelectorAll("#mode-grid .option-card").forEach(c => c.classList.remove("selected"));
-            event.currentTarget.classList.add("selected");
-        }
-
-        function switchScreen(targetId) {
-            const currentActive = document.querySelector(".screen.active");
-            if (currentActive) {
-                currentActive.classList.remove("active");
-                setTimeout(() => {
-                    const next = document.getElementById(targetId);
-                    next.classList.add("active");
-                }, 150);
-            } else {
-                document.getElementById(targetId).classList.add("active");
-            }
-        }
-
-        function goToNamesScreen() {
-            switchScreen("screen-names");
-            const container = document.getElementById("names-list-container");
-            container.innerHTML = "";
-
-            let tempNames = [...playerNames];
-            playerNames = [];
-            const shuffledPresets = [...presetNames].sort(() => 0.5 - Math.random());
-
-            for (let i = 0; i < numPlayers; i++) {
-                const nameWrapper = document.createElement("div");
-                nameWrapper.className = "name-input-wrapper";
-                const defaultName = tempNames[i] || shuffledPresets[i % shuffledPresets.length];
-                
-                nameWrapper.innerHTML = `
-                    <span>${i + 1}</span>
-                    <input type="text" class="name-input" value="${defaultName}" placeholder="Nombre..." onchange="updateName(${i}, this.value)">
-                `;
-                container.appendChild(nameWrapper);
-                playerNames.push(defaultName);
-            }
-        }
-
-        function updateName(idx, val) {
-            const trimmed = val.trim();
-            if (trimmed !== "") {
-                playerNames[idx] = trimmed;
-            }
-        }
-
-        function goBackToSetup() {
-            switchScreen("screen-setup");
-        }
-
-        function initiateRolesDistribution() {
-            const list = wordDatabase[selectedCategory];
-            wordPair = list[Math.floor(Math.random() * list.length)];
-            impostorIndex = Math.floor(Math.random() * numPlayers);
-            activePlayerIdx = 0;
-
-            prepareTransferScreen();
-        }
-
-        function prepareTransferScreen() {
-            switchScreen("screen-transfer");
-            document.getElementById("next-player-name").textContent = playerNames[activePlayerIdx];
-        }
-
-        function switchToHoldScreen() {
-            switchScreen("screen-hold");
-            document.getElementById("hold-player-title").textContent = playerNames[activePlayerIdx];
-            
-            document.getElementById("word-prompt-text").style.display = "block";
-            document.getElementById("word-prompt-text").textContent = "Mantén pulsado arriba para revelar tu palabra";
-            document.getElementById("word-real-text").style.display = "none";
-            document.getElementById("word-real-text").className = "word-text-display";
-            document.getElementById("finish-reveal-btn").style.display = "none";
-            
-            const pad = document.getElementById("touch-pad");
-            pad.style.pointerEvents = "auto";
-            document.getElementById("pad-instruction").innerHTML = "MANTÉN<br>PRESIONADO";
-        }
-
-        function bindTouchEvents() {
-            const pad = document.getElementById("touch-pad");
-
-            const onHoldStart = (e) => {
-                e.preventDefault();
-                displaySecretWord();
-            };
-
-            const onHoldEnd = (e) => {
-                e.preventDefault();
-                obfuscateSecretWord();
-            };
-
-            pad.addEventListener("mousedown", onHoldStart);
-            pad.addEventListener("mouseup", onHoldEnd);
-            pad.addEventListener("mouseleave", onHoldEnd);
-
-            pad.addEventListener("touchstart", onHoldStart);
-            pad.addEventListener("touchend", onHoldEnd);
-            pad.addEventListener("touchcancel", onHoldEnd);
-        }
-
-        function displaySecretWord() {
-            const prompt = document.getElementById("word-prompt-text");
-            const wordText = document.getElementById("word-real-text");
-
-            prompt.style.display = "none";
-            wordText.style.display = "block";
-
-            const isImpostor = (activePlayerIdx === impostorIndex);
-
-            if (activeGameMode === "impostor") {
-                if (isImpostor) {
-                    wordText.innerHTML = `<span class="danger-text">¡ERES EL IMPOSTOR!</span><br><span style="font-size:0.95rem; color:var(--text-muted); font-weight:normal;">Tu palabra de apoyo relacionada es:<br><strong style="color:var(--text-main); font-size:1.2rem;">${wordPair.b}</strong></span>`;
-                } else {
-                    wordText.textContent = wordPair.a;
-                }
-            } 
-            else if (activeGameMode === "infiltrado") {
-                if (isImpostor) {
-                    wordText.textContent = wordPair.b;
-                } else {
-                    wordText.textContent = wordPair.a;
-                }
-            } 
-            else if (activeGameMode === "espia") {
-                if (isImpostor) {
-                    wordText.innerHTML = `<span class="danger-text">¡ERES EL ESPÍA!</span><br><span style="font-size:0.85rem; color:var(--text-muted); font-weight:normal;">No tienes palabra. Interroga con cuidado y finge saber del tema.</span>`;
-                } else {
-                    wordText.textContent = wordPair.a;
-                }
-            }
-        }
-
-        function obfuscateSecretWord() {
-            const prompt = document.getElementById("word-prompt-text");
-            const wordText = document.getElementById("word-real-text");
-
-            prompt.style.display = "block";
-            prompt.textContent = "¡Entendido! Ahora pulsa abajo para continuar.";
-            wordText.style.display = "none";
-
-            const pad = document.getElementById("touch-pad");
-            pad.style.pointerEvents = "none";
-            document.getElementById("pad-instruction").innerHTML = "LISTO";
-            document.getElementById("finish-reveal-btn").style.display = "block";
-        }
-
-        function confirmAndNext() {
-            activePlayerIdx++;
-            if (activePlayerIdx < numPlayers) {
-                prepareTransferScreen();
-            } else {
-                startDebatePhase();
-            }
-        }
-
-        function startDebatePhase() {
-            switchScreen("screen-debate");
-            countdownSeconds = 120;
-            timerPaused = false;
-            document.getElementById("pause-btn").textContent = "Pausar";
-            updateTimerLabel();
-
-            if (timerId) clearInterval(timerId);
-
-            timerId = setInterval(() => {
-                if (!timerPaused) {
-                    countdownSeconds--;
-                    updateTimerLabel();
-
-                    if (countdownSeconds <= 0) {
-                        clearInterval(timerId);
-                        goToVotingScreen();
-                    }
-                }
-            }, 1000);
-        }
-
-        function updateTimerLabel() {
-            const m = Math.floor(countdownSeconds / 60);
-            const s = countdownSeconds % 60;
-            document.getElementById("timer-text").textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        function togglePauseTimer() {
-            timerPaused = !timerPaused;
-            document.getElementById("pause-btn").textContent = timerPaused ? "Reanudar" : "Pausar";
-        }
-
-        function alterTimer(secs) {
-            countdownSeconds = Math.max(0, countdownSeconds + secs);
-            updateTimerLabel();
-        }
-
-        function goToVotingScreen() {
-            if (timerId) clearInterval(timerId);
-            switchScreen("screen-vote");
-            
-            votedPlayerIdx = null;
-            document.getElementById("confirm-vote-btn").disabled = true;
-
-            const container = document.getElementById("vote-container");
-            container.innerHTML = "";
-
-            playerNames.forEach((name, idx) => {
-                const item = document.createElement("div");
-                item.className = "vote-item";
-                item.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:0.75rem;">
-                        <div class="player-color-dot"></div>
-                        <span>${name}</span>
-                    </div>
-                `;
-                item.onclick = () => selectPlayerToEliminate(idx, item);
-                container.appendChild(item);
-            });
-        }
-
-        function selectPlayerToEliminate(idx, el) {
-            votedPlayerIdx = idx;
-            document.querySelectorAll(".vote-item").forEach(item => item.classList.remove("selected"));
-            el.classList.add("selected");
-            document.getElementById("confirm-vote-btn").disabled = false;
-        }
-
-        function processFinalResult() {
-            if (votedPlayerIdx === null) return;
-            switchScreen("screen-result");
-
-            const icon = document.getElementById("res-icon");
-            const title = document.getElementById("res-title");
-            const desc = document.getElementById("res-desc");
-
-            const finalWordA = document.getElementById("summary-word-a");
-            const finalWordB = document.getElementById("summary-word-b");
-            const finalWordBRow = document.getElementById("summary-word-b-row");
-            const finalImpostorName = document.getElementById("summary-impostor-name");
-
-            finalWordA.textContent = wordPair.a;
-            finalImpostorName.textContent = playerNames[impostorIndex];
-
-            if (activeGameMode === "espia") {
-                finalWordBRow.style.display = "none";
-            } else {
-                finalWordBRow.style.display = "flex";
-                finalWordB.textContent = wordPair.b;
-            }
-
-            const isImpostorEliminated = (votedPlayerIdx === impostorIndex);
-
-            if (isImpostorEliminated) {
-                icon.textContent = "🎉";
-                title.textContent = "Inocentes Ganan";
-                title.style.color = "var(--success)";
-                desc.textContent = `Consiguieron desenmascarar a ${playerNames[impostorIndex]}, quien efectivamente era el infiltrado de la partida.`;
-            } else {
-                icon.textContent = "🤫";
-                title.textContent = "Infiltrado Gana";
-                title.style.color = "var(--danger)";
-                desc.textContent = `Eliminaron por error a ${playerNames[votedPlayerIdx]}. ${playerNames[impostorIndex]} logró pasar completamente desapercibido.`;
-            }
-        }
-
-        function resetToHome() {
-            switchScreen("screen-setup");
-        }
-        // Lógica nativa para activar la instalación en celular y PC
-let eventoInstalacion;
-const botonInstalar = document.getElementById('btn-instalar-pwa');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Evita que el navegador lance el aviso automático aburrido
-    e.preventDefault();
-    // Guarda el evento para usarlo cuando presionen tu botón
-    eventoInstalacion = e;
-    // Muestra tu botón flotante violeta estilizado
-    botonInstalar.style.display = 'block';
-});
-
-botonInstalar.addEventListener('click', async () => {
-    if (eventoInstalacion) {
-        // Dispara el menú de instalación original del celular
-        eventoInstalacion.prompt();
-        const { outcome } = await eventoInstalacion.userChoice;
-        if (outcome === 'accepted') {
-            botonInstalar.style.display = 'none';
-        }
-        eventoInstalacion = null;
-    }
-});
-
-// Oculta el botón si el usuario ya lo instaló con éxito
-window.addEventListener('appinstalled', () => {
-    botonInstalar.style.display = 'none';
-    console.log('¡El Impostor se instaló correctamente!');
-});
-        
-    </script>
-</body>
-</html>
