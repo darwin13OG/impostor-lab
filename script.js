@@ -1,7 +1,19 @@
 const words = {
-    "Deportes": [{ a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" }, { a: "Ajedrez", b: "Poker" }, { a: "Surf", b: "Buceo" }],
-    "Comidas": [{ a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" }, { a: "Chocolate", b: "Limón" }, { a: "Taco", b: "Burrito" }],
-    "Lugares": [{ a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" }]
+    "Deportes": [
+        { a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" },
+        { a: "Ciclismo", b: "Motocross" }, { a: "Surf", b: "Buceo" }, { a: "Basket", b: "Voley" },
+        { a: "Golf", b: "Rugby" }, { a: "Ajedrez", b: "Poker" }, { a: "Yoga", b: "Karate" }
+    ],
+    "Comidas": [
+        { a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" },
+        { a: "Helado", b: "Yogur" }, { a: "Taco", b: "Burrito" }, { a: "Pollo", b: "Pescado" },
+        { a: "Manzana", b: "Naranja" }, { a: "Pasta", b: "Ensalada" }
+    ],
+    "Lugares": [
+        { a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" },
+        { a: "Hospital", b: "Aeropuerto" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" },
+        { a: "Gimnasio", b: "Parque" }, { a: "Teatro", b: "Circo" }
+    ]
 };
 
 let state = {
@@ -24,13 +36,6 @@ function switchScreen(id) {
     setTimeout(() => target.classList.add('active'), 50);
 }
 
-// --- SINGLE PHONE LOGIC ---
-function startSinglePlayer() {
-    state.mode = 'single';
-    renderCategories();
-    switchScreen('screen-setup');
-}
-
 function changeCount(v) {
     let el = document.getElementById('player-count-val');
     let n = Math.max(3, Math.min(12, parseInt(el.textContent) + v));
@@ -49,37 +54,41 @@ function renderCategories() {
     });
 }
 
+function startSinglePlayer() {
+    state.mode = 'single';
+    renderCategories();
+    switchScreen('screen-setup');
+}
+
 function goToNames() {
     const n = parseInt(document.getElementById('player-count-val').textContent);
     const cont = document.getElementById('names-container');
     cont.innerHTML = '';
-    for(let i=0; i<n; i++) cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="name-input-field" style="margin-bottom:8px;">`;
+    for(let i=0; i<n; i++) cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="name-input-field">`;
     switchScreen('screen-names');
 }
 
 function initSingleGame() {
     const inputs = document.querySelectorAll('#names-container input');
     state.players = Array.from(inputs).map(inp => ({ name: inp.value, isAlive: true, role: 'innocent' }));
-    setupGameData();
+    setupGameLogic();
     state.currentIdx = 0;
     showReveal();
 }
 
-function setupGameData() {
+function setupGameLogic() {
     state.impostorIdx = Math.floor(Math.random() * state.players.length);
     state.players[state.impostorIdx].role = 'impostor';
     const list = words[state.category];
     state.wordPair = list[Math.floor(Math.random() * list.length)];
 }
 
-// --- REVELADO (BUG FIXED) ---
 function showReveal() {
     state.hasRevealed = false;
     state.isHolding = false;
     switchScreen('screen-reveal');
     document.getElementById('reveal-name').textContent = state.mode === 'multi' ? state.me.name : state.players[state.currentIdx].name;
     document.getElementById('word-display').style.display = 'none';
-    document.getElementById('word-hint').style.display = 'block';
     document.getElementById('word-hint').textContent = "Mantén presionado para ver tu palabra";
     document.getElementById('btn-reveal-ok').style.display = 'none';
     document.getElementById('main-pad').classList.remove('locked');
@@ -119,7 +128,7 @@ function nextReveal() {
     }
 }
 
-// --- MULTI PLAYER LOBBY LOGIC ---
+// --- MULTIPLAYER ---
 function hostGame() {
     const name = document.getElementById('multi-name').value;
     if(!name) return showAlert("Ponte un nombre");
@@ -167,7 +176,6 @@ function joinGame() {
             if(data.type === 'START') {
                 state.mode = 'multi';
                 state.wordPair = data.wordPair;
-                state.multiType = data.multiType;
                 state.players = data.players;
                 state.me.role = data.players.find(p => p.name === state.me.name).role;
                 showReveal();
@@ -178,8 +186,7 @@ function joinGame() {
 
 function updateLobbyUI(list) {
     const names = list || state.players.map(p => p.name);
-    const cont = document.getElementById('lobby-player-list');
-    cont.innerHTML = names.map(n => `<div class="vote-item" style="padding:10px; margin-bottom:5px;">${n}</div>`).join('');
+    document.getElementById('lobby-player-list').innerHTML = names.map(n => `<div class="vote-item" style="padding:10px;">${n}</div>`).join('');
     if(state.isHost) document.getElementById('btn-start-multi').disabled = names.length < 3;
 }
 
@@ -193,14 +200,12 @@ function setMultiMode(m) {
 
 function startMultiGame() {
     state.mode = 'multi';
-    setupGameData();
-    // Host set roles
+    setupGameLogic();
     state.players.forEach((p, i) => p.role = (i === state.impostorIdx ? 'impostor' : 'innocent'));
     broadcast({ 
         type: 'START', 
         wordPair: state.wordPair, 
-        players: state.players.map(p => ({name: p.name, role: p.role, isAlive: true})),
-        multiType: state.multiType
+        players: state.players.map(p => ({name: p.name, role: p.role, isAlive: true}))
     });
     showReveal();
 }
