@@ -4,160 +4,141 @@
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Impostor - Juego de Fiesta</title>
-    
-    <!-- Librería PeerJS -->
+    <title>El Impostor - Shadow Games</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Botón Instalar -->
-    <button id="btn-instalar-pwa">📥 Instalar App</button>
+    <button id="btn-instalar-pwa">📥 Instalar</button>
 
-    <!-- SISTEMA DE ALERTAS PERSONALIZADO (Reemplaza a Google Alert) -->
     <div id="custom-alert" class="alert-overlay">
         <div class="alert-box">
-            <p id="alert-msg">Mensaje del sistema</p>
-            <button class="btn" onclick="closeAlert()">Entendido</button>
+            <p id="alert-msg">Mensaje</p>
+            <button class="btn" onclick="closeAlert()">Aceptar</button>
         </div>
     </div>
 
     <div class="game-container">
         
-        <!-- PANTALLA 0: MENÚ PRINCIPAL -->
+        <!-- MENÚ PRINCIPAL -->
         <div id="screen-menu" class="screen active">
             <div style="text-align: center;">
                 <img src="icono.png" alt="Logo" class="main-logo">
                 <h1>EL <span>IMPOSTOR</span></h1>
-                <p class="subtitle">Descubre al infiltrado antes de que sea tarde</p>
-                <div style="margin-top: 1.5rem;">
+                <p class="subtitle">Descubre al infiltrado</p>
+                <div style="margin-top: 1rem;">
                     <button class="btn" onclick="startSinglePlayer()">📱 Un solo celular</button>
                     <button class="btn btn-secondary" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
                 </div>
             </div>
-            <!-- FOOTER PARA RELLENAR -->
             <div class="footer-info">
-                <p>v2.5 Premium Edition</p>
-                <p>Diversión garantizada para tus fiestas</p>
+                <p>By Shadow</p>
+                <p>© 2026 Shadow Studio</p>
             </div>
         </div>
 
-        <!-- SECCIÓN MODO LOCAL (MULTIJUGADOR) -->
+        <!-- MODO LOCAL -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
-                <p class="subtitle">¿Cómo van a jugar esta partida?</p>
-                
                 <div class="setup-group">
                     <span class="label-purple">TU APODO</span>
-                    <input type="text" id="multi-name" placeholder="Escribe tu nombre..." class="name-input-field">
+                    <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
                 </div>
-
                 <div class="option-grid">
-                    <div class="option-card selected" id="opt-cards" onclick="setMultiMode('cards')">
-                        🃏 Tarjetas
-                        <div class="mini-desc">Están cerca para hablar</div>
-                    </div>
-                    <div class="option-card" id="opt-chat" onclick="setMultiMode('chat')">
-                        💬 Chat
-                        <div class="mini-desc">Están lejos (Debate escrito)</div>
-                    </div>
+                    <div class="option-card selected" id="opt-cards" onclick="setMultiMode('cards')">🃏 Tarjetas</div>
+                    <div class="option-card" id="opt-chat" onclick="setMultiMode('chat')">💬 Chat</div>
                 </div>
-
-                <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
+                <button class="btn" onclick="hostGame()">Crear Partida</button>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
                     <button class="btn" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
                 </div>
             </div>
-            <div class="footer-info">
-                <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
-            </div>
+            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
         </div>
 
-        <!-- PANTALLA SETUP (SINGLE PLAYER) -->
+        <!-- SETUP SINGLE PLAYER -->
         <div id="screen-setup" class="screen">
             <div>
                 <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span class="label-purple">CANTIDAD DE JUGADORES</span>
+                    <span class="label-purple">JUGADORES</span>
                     <div class="num-selector">
                         <button class="btn-small" onclick="changeCount(-1)">-</button>
                         <span id="player-count-val">4</span>
                         <button class="btn-small" onclick="changeCount(1)">+</button>
                     </div>
                 </div>
-                <span class="label-purple">CATEGORÍA DE PALABRAS</span>
+                <span class="label-purple">CATEGORÍA</span>
                 <div id="cat-grid-single" class="option-grid"></div>
             </div>
-            <button class="btn" onclick="goToNames()">Continuar</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Atrás</button>
+                <button class="btn" onclick="goToNames()">Continuar</button>
+            </div>
         </div>
 
-        <!-- PANTALLA NOMBRES -->
+        <!-- NOMBRES -->
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
-                <p class="subtitle">¿Quiénes están jugando?</p>
                 <div id="names-container" class="scroll-area"></div>
             </div>
-            <button class="btn" onclick="initSingleGame()">Comenzar Partida</button>
+            <button class="btn" onclick="initSingleGame()">Comenzar</button>
         </div>
 
-        <!-- PANTALLA REVELADO -->
+        <!-- REVELADO (MEJORADO) -->
         <div id="screen-reveal" class="screen">
             <div style="text-align:center;">
-                <p class="subtitle" id="reveal-instr">Pasa el dispositivo a:</p>
+                <p class="subtitle" id="reveal-instr">Pasa el teléfono a:</p>
                 <h1 id="reveal-name">---</h1>
                 <div class="press-pad" id="main-pad">
                     <span id="pad-label">MANTÉN</span>
                 </div>
                 <div class="word-box">
                     <div id="word-display" style="display:none;"></div>
-                    <div id="word-hint">Mantén pulsado para revelar rol</div>
+                    <div id="word-hint">Presiona una única vez para ver tu rol</div>
                 </div>
             </div>
-            <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido, ocultar</button>
+            <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido</button>
         </div>
 
-        <!-- PANTALLA DEBATE -->
+        <!-- DEBATE (CON CONTROLES) -->
         <div id="screen-debate" class="screen">
             <div>
                 <h1>DEBATE</h1>
-                <p class="subtitle">Interroguen para hallar al impostor</p>
                 <div class="timer-display" id="timer-val">02:00</div>
-                
-                <div id="host-controls" style="display:none; margin-top: 10px;">
-                    <button class="btn-secondary" onclick="proposeVote()">Lanzar Votación</button>
+                <div class="timer-controls">
+                    <button class="btn-small" onclick="alterTimer(-30)">-30</button>
+                    <button class="btn-small" id="pause-btn" onclick="togglePause()">⏸</button>
+                    <button class="btn-small" onclick="alterTimer(30)">+30</button>
                 </div>
             </div>
-            <button class="btn" id="btn-manual-vote" onclick="showVoting()">Ir a Votación</button>
+            <button class="btn" onclick="showVoting()">Votar</button>
         </div>
 
-        <!-- PANTALLA VOTACIÓN -->
+        <!-- VOTACIÓN -->
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
-                <p class="subtitle">Seleccionen por consenso al sospechoso</p>
                 <div id="vote-list" class="scroll-area"></div>
             </div>
-            <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar Expulsión</button>
+            <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar</button>
         </div>
 
-        <!-- PANTALLA RESULTADO -->
+        <!-- RESULTADO -->
         <div id="screen-result" class="screen">
             <div style="text-align:center;">
-                <div id="res-icon" style="font-size:4.5rem;">🕵️‍♂️</div>
-                <h1 id="res-title">RESULTADO</h1>
-                <p id="res-desc" class="subtitle"></p>
+                <div id="res-icon" style="font-size:4rem;">🕵️‍♂️</div>
+                <h1 id="res-title">---</h1>
                 <div class="setup-group" id="res-summary"></div>
             </div>
-            <button class="btn" onclick="location.reload()">Jugar de Nuevo</button>
+            <button class="btn" onclick="location.reload()">Inicio</button>
         </div>
 
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
