@@ -1,4 +1,4 @@
-// --- 1. BASE DE DATOS AMPLIADA ---
+// --- 1. BASE DE DATOS EXTENDIDA ---
 const words = {
     "Deportes": [
         { a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" },
@@ -11,44 +11,42 @@ const words = {
         { a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" },
         { a: "Chocolate", b: "Limón" }, { a: "Ensalada", b: "Pasta" }, { a: "Taco", b: "Burrito" },
         { a: "Helado", b: "Yogur" }, { a: "Huevo", b: "Queso" }, { a: "Pan", b: "Galleta" },
-        { a: "Manzana", b: "Naranja" }, { a: "Pollo", b: "Pescado" }, { a: "Vino", b: "Cerveza" },
-        { a: "Donut", b: "Churro" }, { a: "Papaya", b: "Sandía" }, { a: "Arroz", b: "Maíz" }
+        { a: "Manzana", b: "Naranja" }, { a: "Pollo", b: "Pescado" }, { a: "Donut", b: "Churro" }
     ],
     "Lugares": [
         { a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" },
         { a: "Hospital", b: "Aeropuerto" }, { a: "Gimnasio", b: "Parque" }, { a: "Bosque", b: "Desierto" },
-        { a: "Iglesia", b: "Estadio" }, { a: "Cárcel", b: "Escuela" }, { a: "Hotel", b: "Banco" },
-        { a: "Montaña", b: "Río" }, { a: "Granja", b: "Fábrica" }, { a: "Teatro", b: "Circo" },
-        { a: "Pueblo", b: "Ciudad" }, { a: "Isla", b: "Pantano" }, { a: "Espacio", b: "Submarino" }
+        { a: "Iglesia", b: "Estadio" }, { a: "Cárcel", b: "Escuela" }, { a: "Hotel", b: "Banco" }
     ]
 };
 
-// --- 2. VARIABLES DE ESTADO ---
+// --- 2. ESTADO GLOBAL ---
 let state = {
-    mode: 'single', 
-    players: [], 
+    mode: 'single', // 'single' o 'multi'
+    players: [], // {id, name, role, isAlive, conn}
     category: 'Deportes',
     wordPair: null,
     impostorIdx: -1,
     currentIdx: 0,
     timer: 120,
     timerPaused: false,
-    hasRevealed: false, // Control para ver palabra una sola vez
+    hasRevealed: false,
     isHost: false,
-    peer: null,
-    connections: []
+    me: { id: null, name: "" },
+    roomCode: "",
+    votesReady: 0 // Para el consenso de votación
 };
 
-// --- 3. ALERTAS PERSONALIZADAS ---
+let peer = null;
+let connections = []; // Solo para el Host
+
+// --- 3. UTILIDADES Y ALERTAS ---
 function showAlert(msg) {
     document.getElementById('alert-msg').innerText = msg;
     document.getElementById('custom-alert').style.display = 'flex';
 }
-function closeAlert() {
-    document.getElementById('custom-alert').style.display = 'none';
-}
+function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
-// --- 4. NAVEGACIÓN ---
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => {
         s.classList.remove('active');
@@ -59,9 +57,10 @@ function switchScreen(id) {
     setTimeout(() => target.classList.add('active'), 50);
 }
 
-// --- 5. SETUP (SINGLE PLAYER) ---
+// --- 4. CONFIGURACIÓN (SINGLE & MULTI) ---
 function startSinglePlayer() {
     state.mode = 'single';
+    state.isHost = true;
     renderCategories();
     switchScreen('screen-setup');
 }
@@ -88,86 +87,169 @@ function goToNames() {
     const n = parseInt(document.getElementById('player-count-val').textContent);
     const cont = document.getElementById('names-container');
     cont.innerHTML = '';
-    const presets = ["Sofía", "Mateo", "Valentina", "Santiago", "Camila", "Lucas", "Elena", "Diego", "Maia", "Enzo", "Gael", "Mora"];
     for(let i=0; i<n; i++) {
-        cont.innerHTML += `<input type="text" id="n-${i}" value="${presets[i]}" class="name-input-field" style="margin-bottom:10px;">`;
+        cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="name-input-field" style="margin-bottom:8px;">`;
     }
     switchScreen('screen-names');
 }
 
+// --- 5. LÓGICA DE CONEXIÓN LOCAL (PEERJS) ---
+function hostGame() {
+    const name = document.getElementById('multi-name').value;
+    if(!name) return showAlert("Escribe tu apodo");
+    state.isHost = true;
+    state.me.name = name;
+    state.roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    
+    peer = new Peer("SHADOW-" + state.roomCode);
+    
+    peer.on('open', (id) => {
+        showAlert("SALA: " + state.roomCode + "\nComparte el código.");
+        state.players = [{ id: 'host', name: name, isAlive: true, role: 'innocent' }];
+        switchScreen('screen-setup'); // El Host configura categoría y jugadores
+        renderCategories();
+    });
+
+    peer.on('connection', (conn) => {
+        conn.on('data', (data) => handleData(data, conn));
+    });
+}
+
+function joinGame() {
+    const name = document.getElementById('multi-name').value;
+    const code = document.getElementById('join-id').value.toUpperCase();
+    if(!name || !code) return showAlert("Faltan datos");
+    
+    state.me.name = name;
+    peer = new Peer();
+    
+    peer.on('open', () => {
+        const conn = peer.connect("SHADOW-" + code);
+        conn.on('open', () => {
+            conn.send({ type: 'JOIN', name: name });
+            showAlert("Conectado. Esperando al Host...");
+        });
+        conn.on('data', (data) => handleData(data, conn));
+    });
+}
+
+function handleData(data, conn) {
+    switch(data.type) {
+        case 'JOIN':
+            if(state.isHost) {
+                const newPlayer = { id: conn.peer, name: data.name, isAlive: true, role: 'innocent', conn: conn };
+                state.players.push(newPlayer);
+                connections.push(conn);
+                showAlert(data.name + " se ha unido.");
+            }
+            break;
+        case 'START':
+            state.players = data.players;
+            state.wordPair = data.wordPair;
+            state.mode = 'multi';
+            const me = data.players.find(p => p.name === state.me.name);
+            state.me.role = me.role;
+            showRevealMulti();
+            break;
+        case 'VOTE_PROPOSAL':
+            showAlert("El Host propone votar. ¿Ir a la votación?");
+            showVoting();
+            break;
+        case 'TIMER_SYNC':
+            state.timer = data.timer;
+            updateTimerUI();
+            break;
+    }
+}
+
+// --- 6. INICIO DE PARTIDA ---
 function initSingleGame() {
     const inputs = document.querySelectorAll('#names-container input');
     state.players = Array.from(inputs).map(inp => ({ name: inp.value, isAlive: true, role: 'innocent' }));
-    state.impostorIdx = Math.floor(Math.random() * state.players.length);
-    state.players[state.impostorIdx].role = 'impostor';
-    const list = words[state.category];
-    state.wordPair = list[Math.floor(Math.random() * list.length)];
+    
+    setupRolesAndWords();
+    if(state.mode === 'multi') {
+        connections.forEach(c => c.send({ 
+            type: 'START', 
+            players: state.players, 
+            wordPair: state.wordPair 
+        }));
+    }
     state.currentIdx = 0;
     showReveal();
 }
 
-// --- 6. REVELADO (ANTI-TRAMPA) ---
+function setupRolesAndWords() {
+    state.impostorIdx = Math.floor(Math.random() * state.players.length);
+    state.players[state.impostorIdx].role = 'impostor';
+    const list = words[state.category];
+    state.wordPair = list[Math.floor(Math.random() * list.length)];
+}
+
+// --- 7. REVELADO ÚNICO ---
 function showReveal() {
-    state.hasRevealed = false; // Reset de seguridad
+    state.hasRevealed = false;
     switchScreen('screen-reveal');
     document.getElementById('reveal-name').textContent = state.players[state.currentIdx].name;
     document.getElementById('word-display').style.display = 'none';
-    document.getElementById('word-hint').style.display = 'block';
     document.getElementById('word-hint').textContent = "Presiona una única vez para ver tu rol";
     document.getElementById('btn-reveal-ok').style.display = 'none';
     document.getElementById('main-pad').classList.remove('locked');
-    document.getElementById('pad-label').textContent = "MANTÉN";
+}
+
+function showRevealMulti() {
+    state.hasRevealed = false;
+    switchScreen('screen-reveal');
+    document.getElementById('reveal-instr').textContent = "Tu palabra es:";
+    document.getElementById('reveal-name').textContent = state.me.name;
 }
 
 const pad = document.getElementById('main-pad');
-const press = () => {
-    if(state.hasRevealed) return; // Bloqueo si ya lo vio
-    const p = state.players[state.currentIdx];
+pad.onmousedown = () => {
+    if(state.hasRevealed) return;
+    const p = state.mode === 'multi' ? state.me : state.players[state.currentIdx];
     const disp = document.getElementById('word-display');
     disp.style.display = 'block';
     document.getElementById('word-hint').style.display = 'none';
-    if(p.role === 'impostor') {
-        disp.innerHTML = `<span style="color:var(--danger)">IMPOSTOR</span><br><small>Palabra de apoyo: ${state.wordPair.b}</small>`;
-    } else {
-        disp.textContent = state.wordPair.a;
-    }
+    disp.innerHTML = p.role === 'impostor' ? 
+        `IMPOSTOR<br><small>Apoyo: ${state.wordPair.b}</small>` : state.wordPair.a;
 };
-const release = () => {
+pad.onmouseup = () => {
     if(state.hasRevealed) return;
-    state.hasRevealed = true; // Marcar como revelado para siempre
+    state.hasRevealed = true;
     document.getElementById('word-display').style.display = 'none';
     document.getElementById('word-hint').style.display = 'block';
     document.getElementById('word-hint').textContent = "¡Visto! No puedes volver a verla.";
     document.getElementById('btn-reveal-ok').style.display = 'flex';
-    document.getElementById('main-pad').classList.add('locked');
-    document.getElementById('pad-label').textContent = "LISTO";
+    pad.classList.add('locked');
 };
 
-pad.onmousedown = press; pad.onmouseup = release;
-pad.ontouchstart = (e) => { e.preventDefault(); press(); };
-pad.ontouchend = (e) => { e.preventDefault(); release(); };
-
 function nextReveal() {
-    state.currentIdx++;
-    if(state.currentIdx < state.players.length) showReveal();
-    else startDebate();
+    if(state.mode === 'multi') startDebate();
+    else {
+        state.currentIdx++;
+        if(state.currentIdx < state.players.length) showReveal();
+        else startDebate();
+    }
 }
 
-// --- 7. CRONÓMETRO ---
+// --- 8. CRONÓMETRO Y CONTEXTO ---
 function startDebate() {
     switchScreen('screen-debate');
-    state.timer = 120;
-    state.timerPaused = false;
-    document.getElementById('pause-btn').textContent = "⏸";
-    updateTimerUI();
-    if(window.tInt) clearInterval(window.tInt);
-    window.tInt = setInterval(() => {
-        if(!state.timerPaused) {
-            state.timer--;
-            updateTimerUI();
-            if(state.timer <= 0) { clearInterval(window.tInt); showAlert("¡Tiempo agotado!"); showVoting(); }
-        }
-    }, 1000);
+    if(state.isHost) {
+        state.timer = 120;
+        if(window.tInt) clearInterval(window.tInt);
+        window.tInt = setInterval(() => {
+            if(!state.timerPaused) {
+                state.timer--;
+                updateTimerUI();
+                if(state.mode === 'multi') {
+                    connections.forEach(c => c.send({ type: 'TIMER_SYNC', timer: state.timer }));
+                }
+                if(state.timer <= 0) { clearInterval(window.tInt); showVoting(); }
+            }
+        }, 1000);
+    }
 }
 
 function updateTimerUI() {
@@ -175,86 +257,57 @@ function updateTimerUI() {
     document.getElementById('timer-val').textContent = `${m}:${s<10?'0'+s:s}`;
 }
 
-function togglePause() {
-    state.timerPaused = !state.timerPaused;
-    document.getElementById('pause-btn').textContent = state.timerPaused ? "▶" : "⏸";
+function togglePause() { state.timerPaused = !state.timerPaused; }
+function alterTimer(v) { state.timer = Math.max(0, state.timer + v); updateTimerUI(); }
+
+// --- 9. VOTACIÓN POR CONSENSO ---
+function proposeVote() {
+    if(state.isHost && state.mode === 'multi') {
+        connections.forEach(c => c.send({ type: 'VOTE_PROPOSAL' }));
+    }
+    showVoting();
 }
 
-function alterTimer(v) {
-    state.timer = Math.max(0, state.timer + v);
-    updateTimerUI();
-}
-
-// --- 8. VOTACIÓN Y REGLA DE VICTORIA ---
 function showVoting() {
     switchScreen('screen-vote');
     const list = document.getElementById('vote-list');
     list.innerHTML = '';
-    state.votedIdx = null;
-    document.getElementById('btn-confirm-vote').disabled = true;
     state.players.forEach((p, i) => {
+        if(!p.isAlive) return;
         const el = document.createElement('div');
-        el.className = `vote-item ${p.isAlive ? '' : 'dead'}`;
-        el.innerHTML = `<span>${p.name}</span> <span>${p.isAlive?'Vivo':'Expulsado'}</span>`;
-        if(p.isAlive) {
-            el.onclick = () => {
-                document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
-                el.classList.add('selected');
-                state.votedIdx = i;
-                document.getElementById('btn-confirm-vote').disabled = false;
-            };
-        }
+        el.className = "vote-item";
+        el.innerHTML = `<span>${p.name}</span>`;
+        el.onclick = () => {
+            document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
+            el.classList.add('selected');
+            state.votedIdx = i;
+            document.getElementById('btn-confirm-vote').disabled = false;
+        };
         list.appendChild(el);
     });
 }
 
 function confirmVote() {
     const p = state.players[state.votedIdx];
-    if(p.role === 'impostor') {
-        endGame(true);
-    } else {
+    if(p.role === 'impostor') endGame(true);
+    else {
         p.isAlive = false;
-        const innocentsAlive = state.players.filter(pl => pl.isAlive && pl.role === 'innocent').length;
-        if(innocentsAlive <= 1) {
-            endGame(false);
-        } else {
-            showAlert(`¡${p.name} era inocente! Quedan ${innocentsAlive} inocentes.`);
+        const innocents = state.players.filter(pl => pl.isAlive && pl.role === 'innocent').length;
+        if(innocents <= 1) endGame(false);
+        else {
+            showAlert(`¡${p.name} era inocente! Quedan ${innocents}.`);
             startDebate();
         }
     }
 }
 
-function endGame(innocentsWin) {
+function endGame(win) {
     if(window.tInt) clearInterval(window.tInt);
     switchScreen('screen-result');
-    const title = document.getElementById('res-title');
-    title.textContent = innocentsWin ? "INOCENTES GANAN" : "IMPOSTOR GANA";
-    title.style.color = innocentsWin ? "var(--success)" : "var(--danger)";
-    document.getElementById('res-icon').textContent = innocentsWin ? "🎉" : "🤫";
-    document.getElementById('res-summary').innerHTML = `
-        <p>Palabra: <b>${state.wordPair.a}</b></p>
-        <p>Impostor: <b>${state.players[state.impostorIdx].name}</b></p>
-    `;
-}
-
-// --- 9. MODO LOCAL (PEERJS) ---
-function hostGame() {
-    const name = document.getElementById('multi-name').value;
-    if(!name) return showAlert("Ponte un nombre");
-    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-    state.peer = new Peer("SHADOW-" + code);
-    state.peer.on('open', (id) => {
-        showAlert("SALA CREADA: " + code);
-        switchScreen('screen-menu'); // Aquí podrías crear una pantalla de lobby
-    });
-    state.peer.on('error', () => showAlert("Error de conexión. Intenta otro código."));
-}
-
-function joinGame() {
-    const code = document.getElementById('join-id').value.toUpperCase();
-    if(!code) return showAlert("Falta el código");
-    showAlert("Conectando a la sala " + code + "...");
-    // Lógica de conexión cliente...
+    const t = document.getElementById('res-title');
+    t.textContent = win ? "INOCENTES GANAN" : "IMPOSTOR GANA";
+    t.style.color = win ? "var(--success)" : "var(--danger)";
+    document.getElementById('res-summary').innerHTML = `<p>Palabra: ${state.wordPair.a}</p><p>Impostor: ${state.players.find(pl=>pl.role==='impostor').name}</p>`;
 }
 
 window.onload = () => switchScreen('screen-menu');
