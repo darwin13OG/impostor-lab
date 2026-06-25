@@ -39,23 +39,24 @@
             <div class="footer-info">By Shadow | © 2024</div>
         </div>
 
-        <!-- MODO LOCAL: UNIRSE/CREAR -->
-        <div id="screen-multi-choice" class="screen">
-            <div>
-                <h1>MODO <span>LOCAL</span></h1>
-                <div class="setup-group">
-                    <span class="label-purple">TU APODO</span>
-                    <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
-                </div>
-                <button class="btn" id="btn-host-multi" onclick="hostGame()">Crear Partida (Host)</button>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
-                    <button class="btn" id="btn-join-multi" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
-                </div>
-            </div>
-            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
+        <!-- REEMPLAZA ESTO EN TU screen-multi-choice -->
+<div id="screen-multi-choice" class="screen">
+    <div>
+        <h1>MODO <span>LOCAL</span></h1>
+        <div class="setup-group">
+            <span class="label-purple">TU APODO</span>
+            <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
         </div>
-
+        <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
+        
+        <div class="join-container">
+            <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
+            <button class="btn" id="btn-join-multi" onclick="joinGame()">Unirse</button>
+        </div>
+    </div>
+    <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
+</div>
+        
         <!-- LOBBY MULTIJUGADOR (Fichas de jugadores) -->
         <div id="screen-lobby" class="screen">
             <div>
