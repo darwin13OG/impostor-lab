@@ -10,8 +10,7 @@
 </head>
 <body>
 
-    <button id="btn-instalar-pwa">📥 Instalar</button>
-
+    <!-- Alerta personalizada Shadow Style -->
     <div id="custom-alert" class="alert-overlay">
         <div class="alert-box">
             <p id="alert-msg">Mensaje</p>
@@ -21,21 +20,26 @@
 
     <div class="game-container">
         
-        <!-- MENÚ PRINCIPAL -->
+        <!-- PANTALLA 0: MENÚ PRINCIPAL -->
         <div id="screen-menu" class="screen active">
             <div style="text-align: center;">
                 <img src="icono.png" alt="Logo" class="main-logo">
                 <h1>EL <span>IMPOSTOR</span></h1>
-                <p class="subtitle">Descubre al infiltrado</p>
+                <p class="subtitle">Descubre al infiltrado antes de que sea tarde</p>
                 <div style="margin-top: 1rem;">
                     <button class="btn" onclick="startSinglePlayer()">📱 Un solo celular</button>
                     <button class="btn btn-secondary" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
+                    
+                    <!-- Botón de instalación integrado en el menú -->
+                    <button id="btn-instalar-menu" class="btn-install-menu" style="display: none;">
+                        Instalar app 📥
+                    </button>
                 </div>
             </div>
             <div class="footer-info">By Shadow | © 2024</div>
         </div>
 
-        <!-- MODO LOCAL: CREAR/UNIRSE -->
+        <!-- MODO LOCAL: UNIRSE/CREAR -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
@@ -43,23 +47,23 @@
                     <span class="label-purple">TU APODO</span>
                     <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
                 </div>
-                <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
+                <button class="btn" id="btn-host-multi" onclick="hostGame()">Crear Partida (Host)</button>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
-                    <button class="btn" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
+                    <button class="btn" id="btn-join-multi" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
                 </div>
             </div>
             <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
         </div>
 
-        <!-- LOBBY MULTIJUGADOR -->
+        <!-- LOBBY MULTIJUGADOR (Fichas de jugadores) -->
         <div id="screen-lobby" class="screen">
             <div>
                 <h1>SALA DE <span>ESPERA</span></h1>
                 <div class="room-badge" id="lobby-code-display">----</div>
                 
                 <div id="lobby-settings" style="display:none;">
-                    <span class="label-purple">MODO DE JUEGO</span>
+                    <span class="label-purple">CONFIGURACIÓN</span>
                     <div class="option-grid">
                         <div class="option-card selected" id="l-opt-cards" onclick="setMultiMode('cards')">🃏 Tarjetas</div>
                         <div class="option-card" id="l-opt-chat" onclick="setMultiMode('chat')">💬 Chat</div>
@@ -67,13 +71,15 @@
                 </div>
 
                 <div class="setup-group">
-                    <span class="label-purple">JUGADORES EN LA SALA</span>
-                    <div id="lobby-player-list" class="scroll-area"></div>
+                    <span class="label-purple" id="lobby-status-text">ESPERANDO JUGADORES...</span>
+                    <div id="lobby-player-list" class="player-cards-container">
+                        <!-- Aquí aparecen las fichas visuales de cada jugador -->
+                    </div>
                 </div>
             </div>
             <div id="lobby-footer">
-                <button class="btn" id="btn-start-multi" disabled onclick="startMultiGame()">Empezar (Mín. 3)</button>
-                <p id="client-wait-msg" class="subtitle" style="display:none;">Esperando que el Host inicie...</p>
+                <button class="btn" id="btn-start-multi" disabled onclick="startMultiGame()">Empezar Partida</button>
+                <p id="client-wait-msg" class="subtitle" style="display:none;">El Host iniciará la partida pronto...</p>
             </div>
         </div>
 
@@ -82,11 +88,14 @@
             <div>
                 <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span class="label-purple">CANTIDAD DE JUGADORES</span>
-                    <div class="num-selector">
-                        <button class="btn-small" onclick="changeCount(-1)">-</button>
-                        <span id="player-count-val">4</span>
-                        <button class="btn-small" onclick="changeCount(1)">+</button>
+                    <span class="label-purple">JUGADORES</span>
+                    <div class="num-selector-premium">
+                        <button class="num-ctrl" onclick="changeCount(-1)">−</button>
+                        <div class="num-display">
+                            <span id="player-count-val">4</span>
+                            <small>USUARIOS</small>
+                        </div>
+                        <button class="num-ctrl" onclick="changeCount(1)">+</button>
                     </div>
                 </div>
                 <div id="cat-grid-single" class="option-grid"></div>
@@ -109,7 +118,7 @@
         <!-- REVELADO -->
         <div id="screen-reveal" class="screen">
             <div style="text-align:center;">
-                <p class="subtitle" id="reveal-instr">Pasa el teléfono a:</p>
+                <p class="subtitle" id="reveal-instr">Pasa el dispositivo a:</p>
                 <h1 id="reveal-name">---</h1>
                 <div class="press-pad" id="main-pad">MANTÉN</div>
                 <div class="word-box">
@@ -126,9 +135,9 @@
                 <h1 id="debate-title">DEBATE</h1>
                 <div class="timer-display" id="timer-val">02:00</div>
                 <div class="timer-controls" id="timer-ctrls">
-                    <button class="btn-small" onclick="alterTimer(-30)">-30</button>
+                    <button class="btn-small" onclick="alterTimer(-30)">-30s</button>
                     <button class="btn-small" id="pause-btn" onclick="togglePause()">⏸</button>
-                    <button class="btn-small" onclick="alterTimer(30)">+30</button>
+                    <button class="btn-small" onclick="alterTimer(30)">+30s</button>
                 </div>
             </div>
             <button class="btn" onclick="showVoting()">Ir a Votar</button>
@@ -138,10 +147,10 @@
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
-                <p class="subtitle">Expulsen al sospechoso</p>
+                <p class="subtitle">Seleccionen quién debe abandonar la partida</p>
                 <div id="vote-list" class="scroll-area"></div>
             </div>
-            <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar</button>
+            <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar Expulsión</button>
         </div>
 
         <!-- RESULTADO -->
@@ -151,7 +160,7 @@
                 <h1 id="res-title">---</h1>
                 <div class="setup-group" id="res-summary"></div>
             </div>
-            <button class="btn" onclick="location.reload()">Inicio</button>
+            <button class="btn" onclick="location.reload()">Ir al Inicio</button>
         </div>
 
     </div>
