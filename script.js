@@ -157,8 +157,17 @@ function joinGame() {
 
 function updateLobbyUI(list) {
     const names = list || state.players.map(p => p.name);
-    document.getElementById('lobby-player-list').innerHTML = names.map(n => `<div class="player-chip">${n}</div>`).join('');
-    if(state.isHost) document.getElementById('btn-start-multi').disabled = names.length < 3;
+    const cont = document.getElementById('lobby-player-list');
+    // Ahora usa fichas visuales elegantes
+    cont.innerHTML = `<div class="player-cards-container">` + 
+        names.map(n => `<div class="player-chip">${n}</div>`).join('') + 
+        `</div>`;
+    
+    // CORRECCIÓN: El Host puede iniciar con 3 o más
+    if(state.isHost) {
+        const btnStart = document.getElementById('btn-start-multi');
+        btnStart.disabled = names.length < 3;
+    }
 }
 
 function broadcast(data) { connections.forEach(c => c.send(data)); }
@@ -190,11 +199,20 @@ function alterTimer(v) { state.timer = Math.max(0, state.timer + v); updateTimer
 
 function showVoting() {
     switchScreen('screen-vote');
-    const list = document.getElementById('vote-list'); list.innerHTML = '';
+    const list = document.getElementById('vote-list');
+    list.innerHTML = '';
     state.players.forEach((p, i) => {
         if(!p.isAlive) return;
-        const el = document.createElement('div'); el.className = "vote-item"; el.innerHTML = `<span>${p.name}</span>`;
-        el.onclick = () => { document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected')); el.classList.add('selected'); state.votedIdx = i; document.getElementById('btn-confirm-vote').disabled = false; };
+        const el = document.createElement('div');
+        // IMPORTANTE: Aquí añadimos la clase vote-item que creamos en el CSS
+        el.className = "vote-item";
+        el.innerHTML = `<span>${p.name}</span> <span style="color:var(--primary); font-size:0.7rem;">Votar</span>`;
+        el.onclick = () => {
+            document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
+            el.classList.add('selected');
+            state.votedIdx = i;
+            document.getElementById('btn-confirm-vote').disabled = false;
+        };
         list.appendChild(el);
     });
 }
