@@ -4,7 +4,7 @@
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>El Impostor - Shadow Studio</title>
+    <title>El Impostor - Shadow Games</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -35,7 +35,7 @@
             <div class="footer-info">By Shadow | © 2024</div>
         </div>
 
-        <!-- MODO LOCAL: UNIRSE/CREAR -->
+        <!-- MODO LOCAL: CREAR/UNIRSE -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
@@ -49,10 +49,10 @@
                     <button class="btn" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
                 </div>
             </div>
-            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver</button>
+            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
         </div>
 
-        <!-- LOBBY (SALA DE ESPERA MULTIJUGADOR) -->
+        <!-- LOBBY MULTIJUGADOR -->
         <div id="screen-lobby" class="screen">
             <div>
                 <h1>SALA DE <span>ESPERA</span></h1>
@@ -67,22 +67,22 @@
                 </div>
 
                 <div class="setup-group">
-                    <span class="label-purple">JUGADORES CONECTADOS</span>
-                    <div id="lobby-player-list" class="scroll-area" style="max-height: 150px;"></div>
+                    <span class="label-purple">JUGADORES EN LA SALA</span>
+                    <div id="lobby-player-list" class="scroll-area"></div>
                 </div>
             </div>
             <div id="lobby-footer">
                 <button class="btn" id="btn-start-multi" disabled onclick="startMultiGame()">Empezar (Mín. 3)</button>
-                <p id="client-wait-msg" class="subtitle" style="display:none;">Esperando a que el Host inicie...</p>
+                <p id="client-wait-msg" class="subtitle" style="display:none;">Esperando que el Host inicie...</p>
             </div>
         </div>
 
-        <!-- SETUP (SINGLE PHONE) -->
+        <!-- SETUP SINGLE PHONE -->
         <div id="screen-setup" class="screen">
             <div>
                 <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span class="label-purple">JUGADORES</span>
+                    <span class="label-purple">CANTIDAD DE JUGADORES</span>
                     <div class="num-selector">
                         <button class="btn-small" onclick="changeCount(-1)">-</button>
                         <span id="player-count-val">4</span>
@@ -91,10 +91,13 @@
                 </div>
                 <div id="cat-grid-single" class="option-grid"></div>
             </div>
-            <button class="btn" onclick="goToNames()">Continuar</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Atrás</button>
+                <button class="btn" onclick="goToNames()">Continuar</button>
+            </div>
         </div>
 
-        <!-- NOMBRES (SINGLE PHONE) -->
+        <!-- NOMBRES SINGLE PHONE -->
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
@@ -128,13 +131,14 @@
                     <button class="btn-small" onclick="alterTimer(30)">+30</button>
                 </div>
             </div>
-            <button class="btn" id="btn-to-vote" onclick="showVoting()">Ir a Votar</button>
+            <button class="btn" onclick="showVoting()">Ir a Votar</button>
         </div>
 
         <!-- VOTACIÓN -->
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
+                <p class="subtitle">Expulsen al sospechoso</p>
                 <div id="vote-list" class="scroll-area"></div>
             </div>
             <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar</button>
