@@ -3,7 +3,7 @@
 <head>
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>El Impostor - Shadow Games</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -32,13 +32,10 @@
                     <button class="btn btn-secondary" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
                 </div>
             </div>
-            <div class="footer-info">
-                <p>By Shadow</p>
-                <p>© 2026 Shadow Studio</p>
-            </div>
+            <div class="footer-info">By Shadow | © 2024</div>
         </div>
 
-        <!-- MODO LOCAL -->
+        <!-- MODO LOCAL: UNIRSE/CREAR -->
         <div id="screen-multi-choice" class="screen">
             <div>
                 <h1>MODO <span>LOCAL</span></h1>
@@ -46,20 +43,41 @@
                     <span class="label-purple">TU APODO</span>
                     <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
                 </div>
-                <div class="option-grid">
-                    <div class="option-card selected" id="opt-cards" onclick="setMultiMode('cards')">🃏 Tarjetas</div>
-                    <div class="option-card" id="opt-chat" onclick="setMultiMode('chat')">💬 Chat</div>
-                </div>
-                <button class="btn" onclick="hostGame()">Crear Partida</button>
+                <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
                     <button class="btn" style="width:50%; margin:0;" onclick="joinGame()">Unirse</button>
                 </div>
             </div>
-            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
+            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver</button>
         </div>
 
-        <!-- SETUP SINGLE PLAYER -->
+        <!-- LOBBY (SALA DE ESPERA MULTIJUGADOR) -->
+        <div id="screen-lobby" class="screen">
+            <div>
+                <h1>SALA DE <span>ESPERA</span></h1>
+                <div class="room-badge" id="lobby-code-display">----</div>
+                
+                <div id="lobby-settings" style="display:none;">
+                    <span class="label-purple">MODO DE JUEGO</span>
+                    <div class="option-grid">
+                        <div class="option-card selected" id="l-opt-cards" onclick="setMultiMode('cards')">🃏 Tarjetas</div>
+                        <div class="option-card" id="l-opt-chat" onclick="setMultiMode('chat')">💬 Chat</div>
+                    </div>
+                </div>
+
+                <div class="setup-group">
+                    <span class="label-purple">JUGADORES CONECTADOS</span>
+                    <div id="lobby-player-list" class="scroll-area" style="max-height: 150px;"></div>
+                </div>
+            </div>
+            <div id="lobby-footer">
+                <button class="btn" id="btn-start-multi" disabled onclick="startMultiGame()">Empezar (Mín. 3)</button>
+                <p id="client-wait-msg" class="subtitle" style="display:none;">Esperando a que el Host inicie...</p>
+            </div>
+        </div>
+
+        <!-- SETUP (SINGLE PHONE) -->
         <div id="screen-setup" class="screen">
             <div>
                 <h1>AJUSTES</h1>
@@ -71,16 +89,12 @@
                         <button class="btn-small" onclick="changeCount(1)">+</button>
                     </div>
                 </div>
-                <span class="label-purple">CATEGORÍA</span>
                 <div id="cat-grid-single" class="option-grid"></div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Atrás</button>
-                <button class="btn" onclick="goToNames()">Continuar</button>
-            </div>
+            <button class="btn" onclick="goToNames()">Continuar</button>
         </div>
 
-        <!-- NOMBRES -->
+        <!-- NOMBRES (SINGLE PHONE) -->
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
@@ -89,34 +103,32 @@
             <button class="btn" onclick="initSingleGame()">Comenzar</button>
         </div>
 
-        <!-- REVELADO (MEJORADO) -->
+        <!-- REVELADO -->
         <div id="screen-reveal" class="screen">
             <div style="text-align:center;">
                 <p class="subtitle" id="reveal-instr">Pasa el teléfono a:</p>
                 <h1 id="reveal-name">---</h1>
-                <div class="press-pad" id="main-pad">
-                    <span id="pad-label">MANTÉN</span>
-                </div>
+                <div class="press-pad" id="main-pad">MANTÉN</div>
                 <div class="word-box">
                     <div id="word-display" style="display:none;"></div>
-                    <div id="word-hint">Presiona una única vez para ver tu rol</div>
+                    <div id="word-hint">Mantén presionado para ver tu palabra</div>
                 </div>
             </div>
             <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido</button>
         </div>
 
-        <!-- DEBATE (CON CONTROLES) -->
+        <!-- DEBATE -->
         <div id="screen-debate" class="screen">
             <div>
-                <h1>DEBATE</h1>
+                <h1 id="debate-title">DEBATE</h1>
                 <div class="timer-display" id="timer-val">02:00</div>
-                <div class="timer-controls">
+                <div class="timer-controls" id="timer-ctrls">
                     <button class="btn-small" onclick="alterTimer(-30)">-30</button>
                     <button class="btn-small" id="pause-btn" onclick="togglePause()">⏸</button>
                     <button class="btn-small" onclick="alterTimer(30)">+30</button>
                 </div>
             </div>
-            <button class="btn" onclick="showVoting()">Votar</button>
+            <button class="btn" id="btn-to-vote" onclick="showVoting()">Ir a Votar</button>
         </div>
 
         <!-- VOTACIÓN -->
