@@ -1,21 +1,21 @@
+// --- 1. BASE DE DATOS AMPLIADA ---
 const words = {
     "Deportes": [
         { a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" },
         { a: "Ciclismo", b: "Motocross" }, { a: "Surf", b: "Buceo" }, { a: "Basket", b: "Voley" },
-        { a: "Golf", b: "Rugby" }, { a: "Ajedrez", b: "Poker" }, { a: "Yoga", b: "Karate" }
+        { a: "Golf", b: "Rugby" }, { a: "Ajedrez", b: "Poker" }
     ],
     "Comidas": [
         { a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" },
-        { a: "Helado", b: "Yogur" }, { a: "Taco", b: "Burrito" }, { a: "Pollo", b: "Pescado" },
-        { a: "Manzana", b: "Naranja" }, { a: "Pasta", b: "Ensalada" }
+        { a: "Helado", b: "Yogur" }, { a: "Taco", b: "Burrito" }, { a: "Pollo", b: "Pescado" }
     ],
     "Lugares": [
         { a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" },
-        { a: "Hospital", b: "Aeropuerto" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" },
-        { a: "Gimnasio", b: "Parque" }, { a: "Teatro", b: "Circo" }
+        { a: "Hospital", b: "Aeropuerto" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" }
     ]
 };
 
+// --- 2. ESTADO GLOBAL ---
 let state = {
     mode: 'single', multiType: 'cards', players: [],
     category: 'Deportes', wordPair: null, impostorIdx: -1,
@@ -26,7 +26,11 @@ let state = {
 let peer = null;
 let connections = [];
 
-function showAlert(msg) { document.getElementById('alert-msg').innerText = msg; document.getElementById('custom-alert').style.display = 'flex'; }
+// --- 3. UTILIDADES ---
+function showAlert(msg) { 
+    document.getElementById('alert-msg').innerText = msg; 
+    document.getElementById('custom-alert').style.display = 'flex'; 
+}
 function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
 function switchScreen(id) {
@@ -34,6 +38,32 @@ function switchScreen(id) {
     const target = document.getElementById(id);
     target.style.display = 'flex';
     setTimeout(() => target.classList.add('active'), 50);
+}
+
+// --- 4. INSTALACIÓN (PWA) ---
+let deferredPrompt;
+const btnInstalar = document.getElementById('btn-instalar-menu');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    btnInstalar.style.display = 'block';
+});
+
+btnInstalar.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') btnInstalar.style.display = 'none';
+        deferredPrompt = null;
+    }
+});
+
+// --- 5. SETUP (SINGLE PHONE) ---
+function startSinglePlayer() {
+    state.mode = 'single';
+    renderCategories();
+    switchScreen('screen-setup');
 }
 
 function changeCount(v) {
@@ -52,12 +82,6 @@ function renderCategories() {
         card.onclick = () => { state.category = c; renderCategories(); };
         grid.appendChild(card);
     });
-}
-
-function startSinglePlayer() {
-    state.mode = 'single';
-    renderCategories();
-    switchScreen('screen-setup');
 }
 
 function goToNames() {
@@ -83,6 +107,7 @@ function setupGameLogic() {
     state.wordPair = list[Math.floor(Math.random() * list.length)];
 }
 
+// --- 6. REVELADO (ANTI-TRAMPA) ---
 function showReveal() {
     state.hasRevealed = false;
     state.isHolding = false;
@@ -128,7 +153,7 @@ function nextReveal() {
     }
 }
 
-// --- MULTIPLAYER ---
+// --- 7. MULTIPLAYER (LOBBY & CONEXIÓN) ---
 function hostGame() {
     const name = document.getElementById('multi-name').value;
     if(!name) return showAlert("Ponte un nombre");
@@ -145,10 +170,10 @@ function hostGame() {
         switchScreen('screen-lobby');
     });
     peer.on('connection', (conn) => {
+        if(state.players.length >= 12) return; // Límite 12
         conn.on('data', (data) => {
             if(data.type === 'JOIN') {
-                const newP = { name: data.name, isAlive: true, role: 'innocent', conn: conn };
-                state.players.push(newP);
+                state.players.push({ name: data.name, isAlive: true, role: 'innocent', conn: conn });
                 connections.push(conn);
                 broadcast({ type: 'LIST', list: state.players.map(p => p.name) });
                 updateLobbyUI();
@@ -158,18 +183,24 @@ function hostGame() {
 }
 
 function joinGame() {
-    const name = document.getElementById('multi-name').value;
-    const code = document.getElementById('join-id').value.toUpperCase();
-    if(!name || !code) return showAlert("Faltan datos");
+    const nameInput = document.getElementById('multi-name');
+    const codeInput = document.getElementById('join-id');
+    const btnJoin = document.getElementById('btn-join-multi');
+
+    if(!nameInput.value || !codeInput.value) return showAlert("Faltan datos");
+    
+    btnJoin.classList.add('btn-loading');
+    btnJoin.innerText = "Buscando sala";
+
     peer = new Peer();
     peer.on('open', () => {
-        const conn = peer.connect("SHADOW-" + code);
+        const conn = peer.connect("SHADOW-" + codeInput.value.toUpperCase());
         conn.on('open', () => {
-            conn.send({ type: 'JOIN', name });
-            state.me = { name, isAlive: true, role: 'innocent' };
+            conn.send({ type: 'JOIN', name: nameInput.value });
+            state.me = { name: nameInput.value, isAlive: true, role: 'innocent' };
             switchScreen('screen-lobby');
             document.getElementById('client-wait-msg').style.display = 'block';
-            document.getElementById('lobby-code-display').textContent = code;
+            document.getElementById('lobby-code-display').textContent = codeInput.value.toUpperCase();
         });
         conn.on('data', (data) => {
             if(data.type === 'LIST') updateLobbyUI(data.list);
@@ -186,31 +217,25 @@ function joinGame() {
 
 function updateLobbyUI(list) {
     const names = list || state.players.map(p => p.name);
-    document.getElementById('lobby-player-list').innerHTML = names.map(n => `<div class="vote-item" style="padding:10px;">${n}</div>`).join('');
+    document.getElementById('lobby-player-list').innerHTML = names.map(n => `<div class="player-chip">${n}</div>`).join('');
+    document.getElementById('lobby-status-text').innerText = `JUGADORES: ${names.length} / 12`;
     if(state.isHost) document.getElementById('btn-start-multi').disabled = names.length < 3;
 }
 
 function broadcast(data) { connections.forEach(c => c.send(data)); }
-
-function setMultiMode(m) {
-    state.multiType = m;
-    document.querySelectorAll('#lobby-settings .option-card').forEach(el => el.classList.remove('selected'));
-    document.getElementById('l-opt-' + m).classList.add('selected');
-}
 
 function startMultiGame() {
     state.mode = 'multi';
     setupGameLogic();
     state.players.forEach((p, i) => p.role = (i === state.impostorIdx ? 'impostor' : 'innocent'));
     broadcast({ 
-        type: 'START', 
-        wordPair: state.wordPair, 
+        type: 'START', wordPair: state.wordPair, 
         players: state.players.map(p => ({name: p.name, role: p.role, isAlive: true}))
     });
     showReveal();
 }
 
-// --- TIMER & VOTE ---
+// --- 8. TIMER & VOTO ---
 function startDebate() {
     switchScreen('screen-debate');
     if(!state.isHost && state.mode === 'multi') document.getElementById('timer-ctrls').style.display = 'none';
@@ -236,16 +261,17 @@ function showVoting() {
     const list = document.getElementById('vote-list');
     list.innerHTML = '';
     state.players.forEach((p, i) => {
-        if(!p.isAlive) return;
         const el = document.createElement('div');
-        el.className = "vote-item";
+        el.className = `vote-item ${p.isAlive ? '' : 'dead'}`;
         el.innerHTML = `<span>${p.name}</span>`;
-        el.onclick = () => {
-            document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
-            el.classList.add('selected');
-            state.votedIdx = i;
-            document.getElementById('btn-confirm-vote').disabled = false;
-        };
+        if(p.isAlive) {
+            el.onclick = () => {
+                document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected'));
+                el.classList.add('selected');
+                state.votedIdx = i;
+                document.getElementById('btn-confirm-vote').disabled = false;
+            };
+        }
         list.appendChild(el);
     });
 }
@@ -267,7 +293,7 @@ function endGame(win) {
     const t = document.getElementById('res-title');
     t.textContent = win ? "INOCENTES GANAN" : "IMPOSTOR GANA";
     t.style.color = win ? "var(--success)" : "var(--danger)";
-    document.getElementById('res-summary').innerHTML = `<p>Palabra: ${state.wordPair.a}</p><p>Impostor: ${state.players[state.impostorIdx].name}</p>`;
+    document.getElementById('res-summary').innerHTML = `<p>Palabra: ${state.wordPair.a}</p><p>Impostor: ${state.players.find(pl=>pl.role==='impostor').name}</p>`;
 }
 
 window.onload = () => switchScreen('screen-menu');
