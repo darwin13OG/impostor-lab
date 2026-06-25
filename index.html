@@ -6,81 +6,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>El Impostor - Shadow Games</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg-color: #08080c;
+            --card-bg: #11111a;
+            --card-border: #1e1e2f;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color); color: var(--text-main);
+            height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; 
+            padding: 20px; overflow: hidden;
+        }
+
+        .game-container {
+            width: 100%; max-width: 400px; height: 100%; max-height: 720px;
+            background-color: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 32px; padding: 30px; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        .screen { display: none; flex-direction: column; height: 100%; justify-content: space-between; opacity: 0; transition: 0.3s; }
+        .screen.active { display: flex; opacity: 1; }
+
+        /* LOGO CORREGIDO */
+        .main-logo { 
+            width: 120px; height: 120px; object-fit: contain; 
+            margin: 0 auto 10px auto; display: block; border-radius: 20px;
+        }
+
+        h1 { font-size: 1.8rem; text-align: center; font-weight: 800; text-transform: uppercase; }
+        h1 span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+        /* BOTONES */
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 16px;
+            border-radius: 18px; font-weight: 700; cursor: pointer; width: 100%; 
+            transition: 0.2s; box-shadow: 0 4px 15px var(--primary-glow); font-size: 1rem;
+        }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn:disabled { background: #1e1e2f; color: #444; box-shadow: none; cursor: not-allowed; }
+        .btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); color: var(--text-muted); padding: 15px; border-radius: 18px; width: 100%; cursor: pointer; }
+
+        /* INPUTS Y CONTENEDORES */
+        .setup-group { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        .name-input-field, .code-input-field {
+            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--card-border); 
+            background: #0c0c14; color: white; text-align: center; font-size: 1rem; outline: none;
+        }
+        .join-container { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+        .join-container .code-input-field { width: 60%; margin-bottom: 0; }
+        .join-container .btn { width: 40%; margin-bottom: 0; padding: 12px; }
+
+        /* LOBBY Y FICHAS */
+        .player-cards-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+        .player-chip { background: rgba(139, 92, 246, 0.1); border: 1px solid var(--primary); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; color: white; font-weight: 600; }
+
+        /* CRONOMETRO */
+        .timer-display { font-size: 4rem; font-weight: 900; text-align: center; color: var(--primary); text-shadow: 0 0 25px var(--primary-glow); margin: 10px 0; }
+        .timer-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .btn-small { width: 50px; height: 45px; background: var(--card-border); border: 1px solid var(--primary); color: white; border-radius: 12px; cursor: pointer; }
+
+        /* VOTACION */
+        .vote-item { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); 
+            padding: 15px; border-radius: 16px; margin-bottom: 10px; 
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .vote-item.selected { border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .scroll-area { max-height: 320px; overflow-y: auto; }
+
+        /* ALERTAS */
+        .alert-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(4px); }
+        .alert-box { background: var(--card-bg); border: 2px solid var(--primary); padding: 30px; border-radius: 25px; width: 85%; text-align: center; }
+
+        /* REVELADO */
+        .press-pad { width: 140px; height: 140px; border-radius: 50%; border: 4px dashed var(--primary); margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--primary); font-weight: bold; }
+        .press-pad.locked { border-color: #333; opacity: 0.4; cursor: not-allowed; }
+        .word-box { background: rgba(139, 92, 246, 0.05); border: 1px solid var(--card-border); border-radius: 20px; min-height: 100px; display: flex; align-items: center; justify-content: center; padding: 15px; text-align: center; }
+
+        /* FOOTER Y OTROS */
+        .footer-info { text-align: center; font-size: 0.75rem; color: #333; padding-top: 15px; border-top: 1px solid #1e1e2f; margin-top: auto; }
+        .btn-text { background: none; border: none; color: var(--text-muted); font-weight: bold; cursor: pointer; padding: 10px; width: 100%; }
+        .room-badge { background: #1a1a2e; padding: 10px; border-radius: 12px; text-align: center; font-size: 1.5rem; font-weight: bold; color: var(--primary); border: 1px dashed var(--primary); margin: 10px 0; letter-spacing: 4px; }
+    </style>
 </head>
 <body>
 
-    <!-- Alerta personalizada Shadow Style -->
     <div id="custom-alert" class="alert-overlay">
         <div class="alert-box">
             <p id="alert-msg">Mensaje</p>
-            <button class="btn" onclick="closeAlert()">Aceptar</button>
+            <button class="btn" style="margin-top: 20px;" onclick="closeAlert()">Aceptar</button>
         </div>
     </div>
 
     <div class="game-container">
         
-        <!-- PANTALLA 0: MENÚ PRINCIPAL -->
+        <!-- PANTALLA 0: MENÚ -->
         <div id="screen-menu" class="screen active">
             <div style="text-align: center;">
                 <img src="icono.png" alt="Logo" class="main-logo">
                 <h1>EL <span>IMPOSTOR</span></h1>
-                <p class="subtitle">Descubre al infiltrado antes de que sea tarde</p>
+                <p class="subtitle">Descubre al infiltrado</p>
                 <div style="margin-top: 1rem;">
                     <button class="btn" onclick="startSinglePlayer()">📱 Un solo celular</button>
-                    <button class="btn btn-secondary" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
-                    
-                    <!-- Botón de instalación integrado en el menú -->
-                    <button id="btn-instalar-menu" class="btn-install-menu" style="display: none;">
-                        Instalar app 📥
-                    </button>
+                    <button class="btn btn-secondary" style="margin-top: 10px;" onclick="switchScreen('screen-multi-choice')">🌐 Varios celulares</button>
+                    <button id="btn-instalar-pwa" class="btn-text" style="display:none; margin-top: 15px;">Instalar App 📥</button>
                 </div>
             </div>
             <div class="footer-info">By Shadow | © 2024</div>
         </div>
 
-        <!-- REEMPLAZA ESTO EN TU screen-multi-choice -->
-<div id="screen-multi-choice" class="screen">
-    <div>
-        <h1>MODO <span>LOCAL</span></h1>
-        <div class="setup-group">
-            <span class="label-purple">TU APODO</span>
-            <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field">
+        <!-- MODO LOCAL -->
+        <div id="screen-multi-choice" class="screen">
+            <div>
+                <h1>MODO <span>LOCAL</span></h1>
+                <div class="setup-group">
+                    <span style="color:var(--primary); font-size: 0.7rem; font-weight: bold;">TU APODO</span>
+                    <input type="text" id="multi-name" placeholder="Tu nombre..." class="name-input-field" style="margin-top: 5px;">
+                </div>
+                <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
+                <div class="join-container">
+                    <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
+                    <button class="btn" id="btn-join-multi" onclick="joinGame()">Unirse</button>
+                </div>
+            </div>
+            <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
         </div>
-        <button class="btn" onclick="hostGame()">Crear Partida (Host)</button>
-        
-        <div class="join-container">
-            <input type="text" id="join-id" placeholder="CÓDIGO" class="code-input-field">
-            <button class="btn" id="btn-join-multi" onclick="joinGame()">Unirse</button>
-        </div>
-    </div>
-    <button class="btn-text" onclick="switchScreen('screen-menu')">← Volver al inicio</button>
-</div>
-        
-        <!-- LOBBY MULTIJUGADOR (Fichas de jugadores) -->
+
+        <!-- SALA DE ESPERA -->
         <div id="screen-lobby" class="screen">
             <div>
                 <h1>SALA DE <span>ESPERA</span></h1>
                 <div class="room-badge" id="lobby-code-display">----</div>
-                
-                <div id="lobby-settings" style="display:none;">
-                    <span class="label-purple">CONFIGURACIÓN</span>
+                <div id="lobby-settings" style="display:none; margin-bottom: 10px;">
                     <div class="option-grid">
                         <div class="option-card selected" id="l-opt-cards" onclick="setMultiMode('cards')">🃏 Tarjetas</div>
                         <div class="option-card" id="l-opt-chat" onclick="setMultiMode('chat')">💬 Chat</div>
                     </div>
                 </div>
-
                 <div class="setup-group">
-                    <span class="label-purple" id="lobby-status-text">ESPERANDO JUGADORES...</span>
-                    <div id="lobby-player-list" class="player-cards-container">
-                        <!-- Aquí aparecen las fichas visuales de cada jugador -->
-                    </div>
+                    <span style="color:var(--primary); font-size: 0.7rem; font-weight: bold;">JUGADORES EN LA SALA</span>
+                    <div id="lobby-player-list" class="player-cards-container"></div>
                 </div>
             </div>
-            <div id="lobby-footer">
+            <div>
                 <button class="btn" id="btn-start-multi" disabled onclick="startMultiGame()">Empezar Partida</button>
-                <p id="client-wait-msg" class="subtitle" style="display:none;">El Host iniciará la partida pronto...</p>
+                <p id="client-wait-msg" class="subtitle" style="display:none; margin-top: 10px;">Esperando al Host...</p>
             </div>
         </div>
 
@@ -89,25 +172,18 @@
             <div>
                 <h1>AJUSTES</h1>
                 <div class="setup-group">
-                    <span class="label-purple">JUGADORES</span>
-                    <div class="num-selector-premium">
-                        <button class="num-ctrl" onclick="changeCount(-1)">−</button>
-                        <div class="num-display">
-                            <span id="player-count-val">4</span>
-                            <small>USUARIOS</small>
-                        </div>
-                        <button class="num-ctrl" onclick="changeCount(1)">+</button>
+                    <div style="display:flex; justify-content: space-between; align-items:center;">
+                        <button class="btn-small" onclick="changeCount(-1)">-</button>
+                        <div style="text-align:center;"><span id="player-count-val" style="font-size:2rem; font-weight:900;">4</span><br><small>JUGADORES</small></div>
+                        <button class="btn-small" onclick="changeCount(1)">+</button>
                     </div>
                 </div>
                 <div id="cat-grid-single" class="option-grid"></div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" onclick="switchScreen('screen-menu')">Atrás</button>
-                <button class="btn" onclick="goToNames()">Continuar</button>
-            </div>
+            <button class="btn" onclick="goToNames()">Continuar</button>
         </div>
 
-        <!-- NOMBRES SINGLE PHONE -->
+        <!-- NOMBRES -->
         <div id="screen-names" class="screen">
             <div>
                 <h1>NOMBRES</h1>
@@ -119,12 +195,12 @@
         <!-- REVELADO -->
         <div id="screen-reveal" class="screen">
             <div style="text-align:center;">
-                <p class="subtitle" id="reveal-instr">Pasa el dispositivo a:</p>
+                <p id="reveal-instr" class="subtitle">Pasa el teléfono a:</p>
                 <h1 id="reveal-name">---</h1>
                 <div class="press-pad" id="main-pad">MANTÉN</div>
                 <div class="word-box">
-                    <div id="word-display" style="display:none;"></div>
-                    <div id="word-hint">Mantén presionado para ver tu palabra</div>
+                    <div id="word-display" style="display:none; font-weight:bold; font-size:1.2rem;"></div>
+                    <div id="word-hint">Mantén presionado para ver</div>
                 </div>
             </div>
             <button class="btn" id="btn-reveal-ok" style="display:none;" onclick="nextReveal()">Entendido</button>
@@ -133,12 +209,12 @@
         <!-- DEBATE -->
         <div id="screen-debate" class="screen">
             <div>
-                <h1 id="debate-title">DEBATE</h1>
+                <h1>DEBATE</h1>
                 <div class="timer-display" id="timer-val">02:00</div>
-                <div class="timer-controls" id="timer-ctrls">
-                    <button class="btn-small" onclick="alterTimer(-30)">-30s</button>
+                <div class="timer-controls">
+                    <button class="btn-small" onclick="alterTimer(-30)">-30</button>
                     <button class="btn-small" id="pause-btn" onclick="togglePause()">⏸</button>
-                    <button class="btn-small" onclick="alterTimer(30)">+30s</button>
+                    <button class="btn-small" onclick="alterTimer(30)">+30</button>
                 </div>
             </div>
             <button class="btn" onclick="showVoting()">Ir a Votar</button>
@@ -148,7 +224,7 @@
         <div id="screen-vote" class="screen">
             <div>
                 <h1>VOTACIÓN</h1>
-                <p class="subtitle">Seleccionen quién debe abandonar la partida</p>
+                <p class="subtitle">Seleccionen quién sale</p>
                 <div id="vote-list" class="scroll-area"></div>
             </div>
             <button class="btn" id="btn-confirm-vote" disabled onclick="confirmVote()">Confirmar Expulsión</button>
@@ -161,10 +237,231 @@
                 <h1 id="res-title">---</h1>
                 <div class="setup-group" id="res-summary"></div>
             </div>
-            <button class="btn" onclick="location.reload()">Ir al Inicio</button>
+            <button class="btn" onclick="location.reload()">Inicio</button>
         </div>
 
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        const words = {
+            "Deportes": [{ a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Boxeo" }, { a: "Surf", b: "Buceo" }],
+            "Comidas": [{ a: "Pizza", b: "Helado" }, { a: "Sushi", b: "Asado" }, { a: "Taco", b: "Burrito" }],
+            "Lugares": [{ a: "Cine", b: "Playa" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" }]
+        };
+
+        let state = {
+            mode: 'single', multiType: 'cards', players: [],
+            category: 'Deportes', wordPair: null, impostorIdx: -1,
+            currentIdx: 0, timer: 120, timerPaused: false,
+            hasRevealed: false, isHost: false, me: null, votedIdx: null
+        };
+
+        let peer = null;
+        let connections = [];
+
+        function showAlert(msg) { document.getElementById('alert-msg').innerText = msg; document.getElementById('custom-alert').style.display = 'flex'; }
+        function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+
+        function switchScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+            const target = document.getElementById(id);
+            target.style.display = 'flex';
+            setTimeout(() => target.classList.add('active'), 50);
+        }
+
+        // --- SINGLE PHONE ---
+        function startSinglePlayer() { state.mode = 'single'; renderCategories(); switchScreen('screen-setup'); }
+        function changeCount(v) {
+            let el = document.getElementById('player-count-val');
+            let n = Math.max(3, Math.min(12, parseInt(el.textContent) + v));
+            el.textContent = n;
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('cat-grid-single');
+            grid.innerHTML = '';
+            Object.keys(words).forEach(c => {
+                const card = document.createElement('div');
+                card.className = `option-card ${state.category === c ? 'selected' : ''}`;
+                card.textContent = c;
+                card.onclick = () => { state.category = c; renderCategories(); };
+                grid.appendChild(card);
+            });
+        }
+
+        function goToNames() {
+            const n = parseInt(document.getElementById('player-count-val').textContent);
+            const cont = document.getElementById('names-container'); cont.innerHTML = '';
+            for(let i=0; i<n; i++) cont.innerHTML += `<input type="text" id="n-${i}" value="Jugador ${i+1}" class="name-input-field">`;
+            switchScreen('screen-names');
+        }
+
+        function initSingleGame() {
+            const inputs = document.querySelectorAll('#names-container input');
+            state.players = Array.from(inputs).map(inp => ({ name: inp.value, isAlive: true, role: 'innocent' }));
+            setupLogic();
+            state.currentIdx = 0;
+            showReveal();
+        }
+
+        function setupLogic() {
+            state.impostorIdx = Math.floor(Math.random() * state.players.length);
+            state.players[state.impostorIdx].role = 'impostor';
+            const list = words[state.category];
+            state.wordPair = list[Math.floor(Math.random() * list.length)];
+        }
+
+        function showReveal() {
+            state.hasRevealed = false;
+            switchScreen('screen-reveal');
+            document.getElementById('reveal-name').textContent = state.mode === 'multi' ? state.me.name : state.players[state.currentIdx].name;
+            document.getElementById('word-display').style.display = 'none';
+            document.getElementById('word-hint').textContent = "Mantén presionado para ver";
+            document.getElementById('btn-reveal-ok').style.display = 'none';
+            document.getElementById('main-pad').classList.remove('locked');
+        }
+
+        const pad = document.getElementById('main-pad');
+        const press = () => {
+            if(state.hasRevealed) return;
+            const p = state.mode === 'multi' ? state.me : state.players[state.currentIdx];
+            document.getElementById('word-display').style.display = 'block';
+            document.getElementById('word-hint').style.display = 'none';
+            document.getElementById('word-display').innerHTML = p.role === 'impostor' ? `IMPOSTOR<br><small>Apoyo: ${state.wordPair.b}</small>` : state.wordPair.a;
+        };
+        const release = () => {
+            if(document.getElementById('word-display').style.display === 'none') return;
+            state.hasRevealed = true;
+            document.getElementById('word-display').style.display = 'none';
+            document.getElementById('word-hint').style.display = 'block';
+            document.getElementById('word-hint').textContent = "¡Visto! No puedes volver a ver.";
+            document.getElementById('btn-reveal-ok').style.display = 'flex';
+            pad.classList.add('locked');
+        };
+        pad.onmousedown = press; pad.onmouseup = release;
+        pad.ontouchstart = (e) => { e.preventDefault(); press(); };
+        pad.ontouchend = (e) => { e.preventDefault(); release(); };
+
+        function nextReveal() {
+            if(state.mode === 'multi') startDebate();
+            else {
+                state.currentIdx++;
+                if(state.currentIdx < state.players.length) showReveal();
+                else startDebate();
+            }
+        }
+
+        // --- MULTIPLAYER ---
+        function hostGame() {
+            const name = document.getElementById('multi-name').value;
+            if(!name) return showAlert("Ponte un nombre");
+            state.isHost = true;
+            state.me = { name, isAlive: true, role: 'innocent' };
+            state.players = [state.me];
+            const code = Math.random().toString(36).substring(2, 6).toUpperCase();
+            peer = new Peer("SHADOW-" + code);
+            peer.on('open', () => {
+                document.getElementById('lobby-code-display').textContent = code;
+                document.getElementById('lobby-settings').style.display = 'block';
+                updateLobbyUI();
+                switchScreen('screen-lobby');
+            });
+            peer.on('connection', (conn) => {
+                conn.on('open', () => {
+                    conn.on('data', (data) => {
+                        if(data.type === 'JOIN') {
+                            state.players.push({ name: data.name, isAlive: true, role: 'innocent' });
+                            connections.push(conn);
+                            broadcast({ type: 'LIST', list: state.players.map(p => p.name) });
+                            updateLobbyUI();
+                        }
+                    });
+                });
+            });
+        }
+
+        function joinGame() {
+            const name = document.getElementById('multi-name').value;
+            const code = document.getElementById('join-id').value.toUpperCase();
+            if(!name || !code) return showAlert("Faltan datos");
+            peer = new Peer();
+            peer.on('open', () => {
+                const conn = peer.connect("SHADOW-" + code);
+                conn.on('open', () => {
+                    conn.send({ type: 'JOIN', name });
+                    state.me = { name, isAlive: true, role: 'innocent' };
+                    switchScreen('screen-lobby');
+                    document.getElementById('client-wait-msg').style.display = 'block';
+                    document.getElementById('lobby-code-display').textContent = code;
+                });
+                conn.on('data', (data) => {
+                    if(data.type === 'LIST') updateLobbyUI(data.list);
+                    if(data.type === 'START') {
+                        state.mode = 'multi'; state.wordPair = data.wordPair;
+                        state.players = data.players;
+                        state.me.role = data.players.find(p => p.name === state.me.name).role;
+                        showReveal();
+                    }
+                });
+            });
+        }
+
+        function updateLobbyUI(list) {
+            const names = list || state.players.map(p => p.name);
+            document.getElementById('lobby-player-list').innerHTML = names.map(n => `<div class="player-chip">${n}</div>`).join('');
+            if(state.isHost) document.getElementById('btn-start-multi').disabled = names.length < 3;
+        }
+
+        function broadcast(data) { connections.forEach(c => c.send(data)); }
+
+        function startMultiGame() {
+            setupLogic();
+            state.players.forEach((p, i) => p.role = (i === state.impostorIdx ? 'impostor' : 'innocent'));
+            broadcast({ type: 'START', wordPair: state.wordPair, players: state.players.map(p => ({name: p.name, role: p.role, isAlive: true})) });
+            showReveal();
+        }
+
+        // --- TIMER & VOTE ---
+        function startDebate() {
+            switchScreen('screen-debate');
+            state.timer = 120; updateTimerUI();
+            if(window.tInt) clearInterval(window.tInt);
+            window.tInt = setInterval(() => { if(!state.timerPaused) { state.timer--; updateTimerUI(); if(state.timer <= 0) { clearInterval(window.tInt); showVoting(); } } }, 1000);
+        }
+        function updateTimerUI() { let m = Math.floor(state.timer/60), s = state.timer%60; document.getElementById('timer-val').textContent = `${m}:${s<10?'0'+s:s}`; }
+        function togglePause() { state.timerPaused = !state.timerPaused; document.getElementById('pause-btn').textContent = state.timerPaused ? "▶" : "⏸"; }
+        function alterTimer(v) { state.timer = Math.max(0, state.timer + v); updateTimerUI(); }
+
+        function showVoting() {
+            switchScreen('screen-vote');
+            const list = document.getElementById('vote-list'); list.innerHTML = '';
+            state.players.forEach((p, i) => {
+                if(!p.isAlive) return;
+                const el = document.createElement('div'); el.className = "vote-item"; el.innerHTML = `<span>${p.name}</span>`;
+                el.onclick = () => { document.querySelectorAll('.vote-item').forEach(v=>v.classList.remove('selected')); el.classList.add('selected'); state.votedIdx = i; document.getElementById('btn-confirm-vote').disabled = false; };
+                list.appendChild(el);
+            });
+        }
+
+        function confirmVote() {
+            const p = state.players[state.votedIdx];
+            if(p.role === 'impostor') endGame(true);
+            else { 
+                p.isAlive = false; 
+                const innocents = state.players.filter(pl => pl.isAlive && pl.role === 'innocent').length; 
+                if(innocents <= 1) endGame(false); 
+                else { showAlert(`¡${p.name} era inocente! Quedan ${innocents}.`); startDebate(); } 
+            }
+        }
+
+        function endGame(win) { if(window.tInt) clearInterval(window.tInt); switchScreen('screen-result'); const t = document.getElementById('res-title'); t.textContent = win ? "INOCENTES GANAN" : "IMPOSTOR GANA"; t.style.color = win ? "var(--success)" : "var(--danger)"; document.getElementById('res-summary').innerHTML = `<p>Palabra: ${state.wordPair.a}</p><p>Impostor: ${state.players.find(pl=>pl.role==='impostor').name}</p>`; }
+
+        // --- PWA ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-instalar-pwa').style.display = 'block'; });
+        document.getElementById('btn-instalar-pwa').onclick = async () => { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } };
+
+        window.onload = () => switchScreen('screen-menu');
+    </script>
 </body>
 </html>
