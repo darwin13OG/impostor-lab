@@ -3,15 +3,29 @@ const words = {
     "Deportes": [
         { a: "Fútbol", b: "Tenis" }, { a: "Natación", b: "Alpinismo" }, { a: "Boxeo", b: "Esgrima" },
         { a: "Ciclismo", b: "Motocross" }, { a: "Surf", b: "Buceo" }, { a: "Basket", b: "Voley" },
-        { a: "Golf", b: "Rugby" }, { a: "Ajedrez", b: "Poker" }
+        { a: "Golf", b: "Rugby" }, { a: "Ajedrez", b: "Poker" }, { a: "Patinaje", b: "Esquí" },
+        { a: "Pesca", b: "Caza" }, { a: "F1", b: "MotoGP" }, { a: "Beisbol", b: "Softbol" },
+        { a: "Ping Pong", b: "Badminton" }, { a: "Crossfit", b: "Danza" }, { a: "Yoga", b: "Karate" },
+        { a: "Fútbol Americano", b: "Rugby" }, { a: "Gimnasia", b: "Parkour" }, { a: "Remo", b: "Vela" },
+        { a: "Bolos", b: "Billar" }, { a: "Dardos", b: "Tiro con arco" }
     ],
     "Comidas": [
         { a: "Pizza", b: "Hamburguesa" }, { a: "Sopa", b: "Café" }, { a: "Sushi", b: "Asado" },
-        { a: "Helado", b: "Yogur" }, { a: "Taco", b: "Burrito" }, { a: "Pollo", b: "Pescado" }
+        { a: "Helado", b: "Yogur" }, { a: "Taco", b: "Burrito" }, { a: "Pollo", b: "Pescado" },
+        { a: "Chocolate", b: "Limón" }, { a: "Ensalada", b: "Pasta" }, { a: "Manzana", b: "Naranja" },
+        { a: "Donut", b: "Churro" }, { a: "Papaya", b: "Sandía" }, { a: "Arroz", b: "Maíz" },
+        { a: "Tarta", b: "Galleta" }, { a: "Vino", b: "Cerveza" }, { a: "Pan", b: "Queso" },
+        { a: "Huevo", b: "Tocino" }, { a: "Cebolla", b: "Ajo" }, { a: "Fresa", b: "Cereza" },
+        { a: "Papitas", b: "Nachos" }, { a: "Leche", b: "Jugo" }
     ],
     "Lugares": [
         { a: "Cine", b: "Playa" }, { a: "Biblioteca", b: "Discoteca" }, { a: "Zoológico", b: "Museo" },
-        { a: "Hospital", b: "Aeropuerto" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" }
+        { a: "Hospital", b: "Aeropuerto" }, { a: "Bosque", b: "Desierto" }, { a: "Hotel", b: "Banco" },
+        { a: "Iglesia", b: "Estadio" }, { a: "Cárcel", b: "Escuela" }, { a: "Teatro", b: "Circo" },
+        { a: "Pueblo", b: "Ciudad" }, { a: "Isla", b: "Pantano" }, { a: "Espacio", b: "Submarino" },
+        { a: "Montaña", b: "Río" }, { a: "Granja", b: "Fábrica" }, { a: "Gimnasio", b: "Parque" },
+        { a: "Cabaña", b: "Castillo" }, { a: "Supermercado", b: "Mercado" }, { a: "Puerto", b: "Estación" },
+        { a: "Panadería", b: "Carnicería" }, { a: "Peluquería", b: "Farmacia" }
     ]
 };
 
